@@ -1,0 +1,15 @@
+<package>
+  <description brief="applanix">
+
+     applanix
+
+  </description>
+  <author>Mike Purvis</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/applanix</url>
+  <depend package="rospy" />
+  <depend package="applanix_msgs" />
+</package>
+
+

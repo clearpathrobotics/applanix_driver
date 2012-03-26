@@ -1,0 +1,16 @@
+<package>
+  <description brief="applanix_ctl">
+
+     applanix_ctl
+
+  </description>
+  <author>Mike Purvis</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/applanix_ctl</url>
+  <depend package="rospy"/>
+  <depend package="applanix_msgs"/>
+
+</package>
+
+

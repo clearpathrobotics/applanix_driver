@@ -1,0 +1,17 @@
+TimeDistance td
+
+float32 north_pos_rms_err
+float32 east_pos_rms_err
+float32 down_pos_rms_err
+
+float32 north_vel_rms_err
+float32 east_vel_rms_err
+float32 down_vel_rms_err
+
+float32 roll_rms_err
+float32 pitch_rms_err
+float32 heading_rms_err
+
+float32 err_ellipsoid_semi_major
+float32 err_ellipsoid_semi_minor
+float32 err_ellipsoid_orientation

@@ -1,0 +1,32 @@
+# Group 14
+TimeDistance td
+
+# Bitfield
+uint16 STATUS_PRIMARY_GNSS_LEVER_ARM_CALIBRATING=1
+uint16 STATUS_AUX_1_GNSS_LEVER_ARM_CALIBRATING=2
+uint16 STATUS_AUX_2_GNSS_LEVER_ARM_CALIBRATING=4
+uint16 STATUS_DMI_LEVER_ARM_CALIBRATING=8
+uint16 STATUS_DMI_SCALE_FACTOR_CALIBRATING=16
+uint16 STATUS_POSITION_FIX_LEVER_ARM_CALIBRATING=64
+uint16 STATUS_PRIMARY_GNSS_LEVER_ARM_CALIBRATED=256
+uint16 STATUS_AUX_1_GNSS_LEVER_ARM_CALIBRATED=512
+uint16 STATUS_AUX_2_GNSS_LEVER_ARM_CALIBRATED=1024
+uint16 STATUS_DMI_LEVER_ARM_CALIBRATED=2048
+uint16 STATUS_DMI_SCALE_FACTOR_CALIBRATED=4096
+uint16 STATUS_POSITION_FIX_LEVER_ARM_CALIBRATED=16384
+uint16 status
+
+geometry_msgs/Point32 primary_gnss_lever_arm
+uint16 primary_gnss_lever_fom
+
+geometry_msgs/Point32 aux_1_gnss_lever_arm
+uint16 aux_1_gnss_lever_fom
+
+geometry_msgs/Point32 aux_2_gnss_lever_arm
+uint16 aux_2_gnss_lever_fom
+
+geometry_msgs/Point32 dmi_lever_arm
+uint16 dmi_lever_fom
+
+float32 dmi_scale_factor
+uint16 dmi_scale_factor_fom

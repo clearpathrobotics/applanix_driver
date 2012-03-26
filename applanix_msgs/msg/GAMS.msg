@@ -1,0 +1,23 @@
+TimeDistance td
+
+uint8 num_satellites
+float32 a_priori_pdop
+float32 antenna_separation
+
+uint8 STATUS_FIXED_INTEGER=0
+uint8 STATUS_FIXED_INTEGER_TEST_INSTALL_DATA=1
+uint8 STATUS_DEGRADED_FIXED_INTEGER=2
+uint8 STATUS_FLOATED_AMBIGUITY=3
+uint8 STATUS_DEGRADED_FLOATED_AMBIGUITY=4
+uint8 STATUS_SOLUTION_WITHOUT_INSTALL_DATA=5
+uint8 STATUS_SOLUTION_FROM_ATTITUDE_AND_INSTALL_DATA=6
+uint8 STATUS_NO_SOLUTION=7
+uint8 status
+
+uint8 PRN_UNASSIGNED=0
+uint8[12] prn_assignment
+
+uint16 cycle_slip_flag
+
+float64 gams_heading
+float64 gams_heading_rms_err
