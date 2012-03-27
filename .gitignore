@@ -1,0 +1,11 @@
+*.swp
+*.pyc
+*.swo
+msg_gen
+srv_gen
+build
+applanix_msgs/src/applanix_msgs
+applanix_ctl/src/applanix_ctl
+applanix_bridge/src/applanix_bridge
+applanix_ctl/srv/*
+applanix_ctl/msg/*

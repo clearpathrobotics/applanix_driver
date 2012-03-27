@@ -2,7 +2,8 @@
 import roslib; roslib.load_manifest('applanix_msgs')
 from applanix_msgs.msg import *
 
-# applanix group number : ( topic name, ROS message class )
+
+# applanix group number : ( topic name, ROS message class, [opts] )
 groups = {
       1: ("nav", NavigationSolution),
       2: ("status/perf", NavigationPerformance),
@@ -25,8 +26,8 @@ groups = {
       22: ("status/base_gnss/2/modem", BaseGNSSModemStatus),
       23: ("raw/gnss/aux_1_display", RawData),
       24: ("raw/gnss/aux_2_display", RawData),
-      25: None,
-      26: None,
+#      25: (None, None),
+#      26: (None, None),
       30: ("events/3", Event),
       31: ("events/4", Event),
       32: ("events/5", Event),
@@ -46,15 +47,59 @@ groups = {
       }
 
 msgs = {
+      0: ("ack", Ack),
       20: ("general", GeneralParams),
       21: ("gams", GAMSParams),
       22: ("aiding_sensors", AidingSensorParams),
-    }
+      24: ("user_accuracy", UserAccuracySpecs),
+      30: ("primary_gnss_setup", GNSSSetup),
+      31: ("secondary_gnss_setup", GNSSSetup),
+      32: ("ip_address", IPAddress),
+      33: ("event_setup", EventSetup),
+      34: ("com_port_setup", COMPortSetup),
+       35: ("nmea_message_select", NMEAMessageSelect),
+       36: ("binary_message_select", BinaryMessageSelect),
+       37: ("base_gnss_1_setup", BaseGNSSSetup),
+       38: ("base_gnss_2_setup", BaseGNSSSetup),
+       40: ("precise_gravity", PreciseGravitySpecs),
+       41: ("primary_dgps_source", DGPSSourceControl),
+       50: ("nav_mode", NavModeControl),
+       51: ("display_port", PortControl),
+       52: ("primary_data_port", PortControl),
+       53: ("logging_port", LoggingControl),
+       54: ("save_restore", SaveRestoreControl),
+       55: ("time_sync", TimeSyncControl),
+       57: ("installation_calibration", InstallationCalibrationControl),
+       58: ("gams_calibration", GAMSCalibrationControl),
+       61: ("secondary_data_port", PortControl),
+       90: ("program", ProgramControl),
+       91: ("gnss", GNSSControl),
+       92: ("integration_diagnostics", IntegrationDiagnosticsControl),
+       93: ("aiding_sensor_integration", AidingSensorIntegrationControl),
+     }
 
-ack = {
-      0: ("ack", Ack),
-    }
+### Per-message options to guide the APP deserialization.
+
+# no_receive: True to exclude from AllMsgs aggregate message
+for msg in [Ack, SaveRestoreControl, InstallationCalibrationControl, 
+    GAMSCalibrationControl, ProgramControl, GNSSControl]:
+  msg.no_receive = True
+
+# array_mode: "item_count", "byte_count", "infer"
+# required for messages containing variable-length arrays.
+BinaryMessageSelect.array_mode = "uint8_items"
+NMEAMessageSelect.array_mode = "uint8_items"
+GNSSAuxStatus.array_mode = "uint16_bytes"
+GNSSStatus.array_mode = "uint16_bytes"
+COMPortSetup.array_mode = "uint8_items"
+PortControl.array_mode = "uint16_items"
+LoggingControl.array_mode = "uint16_items"
+
+_default = (None, None, {})
+def fill_defaults(input_tuple):
+  return input_tuple + _default[len(input_tuple):len(_default)]
+
 
 if __name__ == '__main__':
   from pprint import pprint
-  pprint((groups, msgs, ack))
+  pprint((groups, msgs))

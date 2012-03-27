@@ -1,15 +1,16 @@
 <package>
-  <description brief="applanix">
+  <description brief="applanix_bridge">
 
-     applanix
+     applanix_bridge
 
   </description>
   <author>Mike Purvis</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/applanix</url>
+  <url>http://ros.org/wiki/applanix_bridge</url>
   <depend package="rospy" />
   <depend package="applanix_msgs" />
+  <depend package="applanix_ctl" />
 </package>
 
 

@@ -40,6 +40,7 @@ class FixedFieldsHandler:
     struct_strs.extend([pattern(f) for f in fields])
     self.struct = struct.Struct(''.join(struct_strs))
     self.names = [f.name for f in fields]
+    self.size = self.struct.size
 
   def serialize(self, buff, msg):
     pass
@@ -53,33 +54,51 @@ class FixedFieldsHandler:
 
 
 class SubMessageArrayHandler:
+  struct_uint16 = struct.Struct('<H')
+  struct_uint8 = struct.Struct('<B')
+
   def __init__(self, field):
     self.name = field.name
     self.msg_cls = roslib.message.get_message_class(field.base_type)
     self.translator = get(self.msg_cls)
-    self.struct = struct.Struct('<H')
 
   def deserialize(self, buff, msg):
-    # TODO: mechanism to skip length check for Group 26. (grrr)
-    length = self.struct.unpack(buff.read(self.struct.size))[0]
-    data = StringIO(buff.read(length))
+    if msg.array_mode == "uint16_bytes":
+      length = self.struct_uint16.unpack(buff.read(self.struct_uint16.size))[0]
+      data = StringIO(buff.read(length))
+    elif msg.array_mode == "uint8_items":
+      length = self.struct_uint8.unpack(buff.read(self.struct_uint8.size))[0] * self.translator.size
+      data = StringIO(buff.read(length))
+    elif msg.array_mode == "uint16_items":
+      length = self.struct_uint16.unpack(buff.read(self.struct_uint16.size))[0] * self.translator.size
+      data = StringIO(buff.read(length))
+    elif msg.array_mode == "infer":
+      data = buff
+    else:
+      raise ValueError("Unrecognized array_mode.")
+
+    # Find and empty the array to be populated.
     array = getattr(msg, self.name)
+    array[:] = []
+
     try:
-      submessage = self.msg_cls()
-      self.translator.deserialize(data, submessage)
-      array.append(submessage)
+      while True:
+        submessage = self.msg_cls()
+        self.translator.deserialize(data, submessage)
+        array.append(submessage)
     except EndOfBuffer:
       pass
 
 
 class VariableStringHandler:
+  struct_bytes = struct.Struct('<H')
+
   def __init__(self, field):
     self.name = field.name
-    self.struct = struct.Struct('<H')
 
   def deserialize(self, buff, msg):
     # TODO: mechanism to skip length check for Group 26. (grrr)
-    length = self.struct.unpack(buff.read(self.struct.size))[0]
+    length = self.struct_bytes.unpack(buff.read(self.struct_bytes.size))[0]
     setattr(msg, self.name, str(buff.read(length)))
 
 
@@ -91,8 +110,6 @@ class Translator:
 
     fixed_fields = []
     for field in spec.parsed_fields():
-      #from pprint import pprint
-      #pprint(field)
       if roslib.genpy.is_simple(field.base_type) and (field.array_len != None or not field.is_array):
         # Simple types and fixed-length character arrays.
         fixed_fields.append(field)
@@ -113,6 +130,9 @@ class Translator:
 
     if len(fixed_fields) > 0:
       self.handlers.append(FixedFieldsHandler(fixed_fields))
+
+    if len(self.handlers) == 1 and hasattr(self.handlers[0], 'size'):
+      self.size = self.handlers[0].size
 
   def deserialize(self, buff, msg):
     try:

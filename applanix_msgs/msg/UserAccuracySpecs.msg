@@ -1,0 +1,7 @@
+# Msg 24
+uint16 transaction
+
+float32 user_altitude_accuracy
+float32 user_heading_accuracy
+float32 user_position_accuracy
+float32 user_velocity_accuracy

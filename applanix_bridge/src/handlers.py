@@ -24,12 +24,20 @@ class GroupHandler(Handler):
 
 
 class MessageHandler(Handler):
-  def __init__(self, name, data_class):
+  def __init__(self, name, data_class, all_msgs):
     self.name = name
+    if hasattr(data_class, 'no_receive') and data_class.no_receive == True:
+      self.msg = data_class()
+    else:
+      self.msg = getattr(all_msgs, name) 
     self.translator = translator.get(data_class)
 
+    # Keep a reference to the all_msgs aggregate message.
+    self.all_msgs = all_msgs
+
   def handle(self, data):
-    print "Received:", name, " len:", len(data)
+    self.translator.deserialize(data, self.msg)
+    self.all_msgs.last_changed = rospy.get_rostime()
 
 
 class AckHandler(Handler):

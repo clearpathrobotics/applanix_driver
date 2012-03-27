@@ -1,0 +1,8 @@
+# Msg 54
+uint16 transaction
+
+uint8 CONTROL_NONE=0
+uint8 CONTROL_SAVE_NVM=1
+uint8 CONTROL_RESTORE_NVM=2
+uint8 CONTROL_RESTORE_FACTORY=3
+uint8 control
