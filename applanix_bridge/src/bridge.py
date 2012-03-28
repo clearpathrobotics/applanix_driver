@@ -10,7 +10,6 @@ from pprint import pprint
 import socket
 import struct
 from cStringIO import StringIO
-import select
 import time
 
 import translator
@@ -29,9 +28,8 @@ PREFIX_DEFAULTS = {
     "status": True,
     "events": True
     }
-HEADER_LEN = 8
-SELECT_TIMEOUT = 0.1
-ALLMSGS_SEND_TIMEOUT = rospy.Duration.from_sec(0.1)
+ALLMSGS_SEND_TIMEOUT = rospy.Duration.from_sec(0.01)
+
 
 def main():
   rospy.init_node('applanix_bridge')
@@ -58,9 +56,10 @@ def main():
 
   try:
     data_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    data_sock.settimeout(0.1)
     ip_port = (ip, PORTS_DATA[data_port])
     data_sock.connect(ip_port)
-    rlist = [data_sock]
+    rospy.loginfo("Successfully connected to data port at %s:%d" % ip_port)
   except socket.error:
     rospy.logfatal("Couldn't connect to data port at %s:%d." % ip_port)
     exit(1)
@@ -71,7 +70,7 @@ def main():
       control_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       ip_port = (ip, PORT_CONTROL)
       control_sock.connect(ip_port)
-      rlist.append(control_sock)
+      rospy.loginfo("Successfully connected to control port at %s:%d" % ip_port)
     except socket.error:
       rospy.logfatal("Couldn't connect to control port at %s:%d." % ip_port)
       data_sock.close()
@@ -105,44 +104,84 @@ def main():
 
   counters = {}
   bad = set()
-  header_translator = translator.get(common.CommonHeader)
+  header = common.CommonHeader()
+  footer = common.CommonFooter()
+  translator.get(common.CommonHeader)
+  translator.get(common.CommonFooter)
+  checksum_struct = struct.Struct("<hh")
 
   try:
     while not rospy.is_shutdown():
-      try:
-        rlist_ready, wlist_ready, xlist_ready = select.select(rlist, [], [], SELECT_TIMEOUT)
-      except select.error:
-        rospy.loginfo("Exiting on select break.")
-        break
-
-      ready = set(rlist_ready)
-
-      header = common.CommonHeader()
-      data = StringIO(data_sock.recv(HEADER_LEN))
-      header_translator.deserialize(data, header)
+      
+      """skipped_chars = []
+      initial_chars = []
+      while True:
+        initial_chars.append(data_sock.recv(1))
+        if initial_chars == ["$", "G"] or initial_chars == ["$", "M"]:
+          break
+        elif initial_chars != ["$"]: 
+          skipped_chars.extend(initial_chars)
+          initial_chars = []
+      if len(skipped_chars) > 0:
+        rospy.logwarn("Skipped %d out-of-message characters on wire." % len(skipped_chars))
+      """
+      # Receive remaining header from data socket.
+      # header_str = ''.join(initial_chars) + data_sock.recv(header.translator.size - len(initial_chars))
+      header_str = data_sock.recv(header.translator.size)
+      header_data = StringIO(header_str)
+      header.translator.deserialize(header_data, header)
       pkt = (str(header.start).encode('string_escape'), header.id)
-      if pkt[0] == '$MSG':
-        print pkt
-        print all_msgs
 
-      data = StringIO(data_sock.recv(header.length))
+      # Initial sanity check.
+      if pkt[0] not in (common.CommonHeader.START_GROUP, common.CommonHeader.START_MESSAGE):
+        rospy.logwarn("Bad header %s.%d" % pkt)
+        continue
+
+      # Special case for a troublesome undocumented packet.
+      # It reports a length of 132, but contains no checksum or footer, and is trailed
+      # by three out-of-message bytes.
+      if pkt == ("$GRP", 20015):
+        data_sock.recv(135)
+        continue
+
+      # Receive remainder of packet from data socket. 
+      packet_str = data_sock.recv(header.length)
+
+      # Check footer and checksum.
+      footer_data = StringIO(packet_str[-footer.translator.size:])
+      footer.translator.deserialize(footer_data, footer)
+      if str(footer.end) != common.CommonFooter.END:
+        rospy.logwarn("Bad footer from packet %s.%d" % pkt)
+        continue
+
+      checksum = 0
+      packet_data = StringIO(header_str + packet_str)
+      while True:
+        data = packet_data.read(checksum_struct.size)
+        if data == "": break
+        c1, c2 = checksum_struct.unpack(data)
+        checksum += c1 + c2
+      if checksum % 65536 != 0:
+        rospy.logwarn("Bad checksum from packet %s.%d: %%d" % pkt % checksum)
+        continue
 
       try:
-        #  print [ord(a) for a in data.getvalue()[26:100]]
-        handlers[pkt].handle(data)
+        payload_data = StringIO(packet_str)
+        handlers[pkt].handle(payload_data)
 
       except translator.TranslatorError:
         if pkt not in bad:
           rospy.logwarn("Error parsing %s.%d" % pkt)
-          bad.add(pkt)
+          raise
+          #bad.add(pkt)
 
       except KeyError:
         warn = True
         if pkt in counters:
           # Already seen this message-- only warn once.
           warn = False
-        if pkt[0] in ('$GRP', '$MSG') and pkt[1] >= 20000:
-          # Internal Applanix diagnostic messages.
+        if pkt[1] >= 20000:
+          # Undocumented messages.
           warn = False
         if warn:
           rospy.logwarn("Unimplemented %s.%d" % pkt)
@@ -154,20 +193,20 @@ def main():
       if all_msgs.last_changed > all_msgs.last_sent and \
           rospy.get_rostime() > all_msgs.last_changed + ALLMSGS_SEND_TIMEOUT:
         all_msgs_pub.publish(all_msgs)
-        print "PUBLISH!!!"
+        # print "PUBLISH!!!"
         all_msgs.last_sent = rospy.get_rostime()
 
+  except socket.error as e:
+    # Swallow a standard interruption error.
+    if (e.errno != 4):
+      raise
 
   finally:
     if control_sock:
-      print "Closing control socket"
-      #control_sock.shutdown(socket.SHUT_RDWR)
-      #time.sleep(0.3)
+      rospy.loginfo("Closing control socket")
       control_sock.close()
 
-    print "Closing data socket"
-    #data_sock.shutdown(socket.SHUT_RDWR)
-    #time.sleep(0.3)
+    rospy.loginfo("Closing data socket")
     data_sock.close()
 
     time.sleep(1.0)

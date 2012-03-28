@@ -26,8 +26,8 @@ groups = {
       22: ("status/base_gnss/2/modem", BaseGNSSModemStatus),
       23: ("raw/gnss/aux_1_display", RawData),
       24: ("raw/gnss/aux_2_display", RawData),
-#      25: (None, None),
-#      26: (None, None),
+      25: ("status/dgps", GNSSDGPSStatus),
+      26: ("status/dgps_stations", GNSSDGPSStationDatabase),
       30: ("events/3", Event),
       31: ("events/4", Event),
       32: ("events/5", Event),
@@ -57,47 +57,37 @@ msgs = {
       32: ("ip_address", IPAddress),
       33: ("event_setup", EventSetup),
       34: ("com_port_setup", COMPortSetup),
-       35: ("nmea_message_select", NMEAMessageSelect),
-       36: ("binary_message_select", BinaryMessageSelect),
-       37: ("base_gnss_1_setup", BaseGNSSSetup),
-       38: ("base_gnss_2_setup", BaseGNSSSetup),
-       40: ("precise_gravity", PreciseGravitySpecs),
-       41: ("primary_dgps_source", DGPSSourceControl),
-       50: ("nav_mode", NavModeControl),
-       51: ("display_port", PortControl),
-       52: ("primary_data_port", PortControl),
-       53: ("logging_port", LoggingControl),
-       54: ("save_restore", SaveRestoreControl),
-       55: ("time_sync", TimeSyncControl),
-       57: ("installation_calibration", InstallationCalibrationControl),
-       58: ("gams_calibration", GAMSCalibrationControl),
-       61: ("secondary_data_port", PortControl),
-       90: ("program", ProgramControl),
-       91: ("gnss", GNSSControl),
-       92: ("integration_diagnostics", IntegrationDiagnosticsControl),
-       93: ("aiding_sensor_integration", AidingSensorIntegrationControl),
-     }
+      35: ("nmea_message_select", NMEAMessageSelect),
+      36: ("binary_message_select", BinaryMessageSelect),
+      37: ("base_gnss_1_setup", BaseGNSSSetup),
+      38: ("base_gnss_2_setup", BaseGNSSSetup),
+      40: ("precise_gravity", PreciseGravitySpecs),
+      41: ("primary_dgps_source", DGPSSourceControl),
+      50: ("nav_mode", NavModeControl),
+      51: ("display_port", PortControl),
+      52: ("primary_data_port", PortControl),
+      53: ("logging_port", LoggingControl),
+      54: ("save_restore", SaveRestoreControl),
+      55: ("time_sync", TimeSyncControl),
+      57: ("installation_calibration", InstallationCalibrationControl),
+      58: ("gams_calibration", GAMSCalibrationControl),
+      61: ("secondary_data_port", PortControl),
+      90: ("program", ProgramControl),
+      91: ("gnss", GNSSControl),
+      92: ("integration_diagnostics", IntegrationDiagnosticsControl),
+      93: ("aiding_sensor_integration", AidingSensorIntegrationControl),
+    }
 
-### Per-message options to guide the APP deserialization.
 
-# no_receive: True to exclude from AllMsgs aggregate message
-for msg in [Ack, SaveRestoreControl, InstallationCalibrationControl, 
-    GAMSCalibrationControl, ProgramControl, GNSSControl]:
-  msg.no_receive = True
-
-# array_mode: "item_count", "byte_count", "infer"
-# required for messages containing variable-length arrays.
-BinaryMessageSelect.array_mode = "uint8_items"
-NMEAMessageSelect.array_mode = "uint8_items"
-GNSSAuxStatus.array_mode = "uint16_bytes"
-GNSSStatus.array_mode = "uint16_bytes"
-COMPortSetup.array_mode = "uint8_items"
-PortControl.array_mode = "uint16_items"
-LoggingControl.array_mode = "uint16_items"
-
-_default = (None, None, {})
-def fill_defaults(input_tuple):
-  return input_tuple + _default[len(input_tuple):len(_default)]
+# in_all_msgs
+# controls whether message appears in AllMsgs aggregate message
+all_msgs_exclude = set([Ack, SaveRestoreControl, InstallationCalibrationControl, 
+    GAMSCalibrationControl, ProgramControl, GNSSControl])
+for name, msg in msgs.values():
+  if msg in all_msgs_exclude:
+    msg.in_all_msgs = False
+  else:
+    msg.in_all_msgs = True
 
 
 if __name__ == '__main__':

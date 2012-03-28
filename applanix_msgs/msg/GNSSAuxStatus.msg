@@ -15,8 +15,8 @@ uint8 SOLUTION_OMNISTAR_XP=10
 uint8 SOLUTION_OMNISTAR_VBS=11
 uint8 solution_status
 
-uint8 sv_tracked
-
+uint8 channels_count
+uint16 reserved
 GNSSChannelStatus[] channels
 
 float32 hdop
@@ -30,5 +30,6 @@ float64 gps_time_offset
 float32 gnss_latency
 float32 geoidal_separation
 
+#TODO: enum
 uint16 nmea_messages_received
 uint8 in_use

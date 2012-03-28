@@ -59,23 +59,18 @@ class SubMessageArrayHandler:
 
   def __init__(self, field):
     self.name = field.name
+    self.name_count = "%s_count" % self.name
     self.msg_cls = roslib.message.get_message_class(field.base_type)
     self.translator = get(self.msg_cls)
 
   def deserialize(self, buff, msg):
-    if msg.array_mode == "uint16_bytes":
-      length = self.struct_uint16.unpack(buff.read(self.struct_uint16.size))[0]
+    if hasattr(msg, self.name_count):
+      # Another field specifies number of array items to deserialize.
+      length = getattr(msg, self.name_count) * self.translator.size
       data = StringIO(buff.read(length))
-    elif msg.array_mode == "uint8_items":
-      length = self.struct_uint8.unpack(buff.read(self.struct_uint8.size))[0] * self.translator.size
-      data = StringIO(buff.read(length))
-    elif msg.array_mode == "uint16_items":
-      length = self.struct_uint16.unpack(buff.read(self.struct_uint16.size))[0] * self.translator.size
-      data = StringIO(buff.read(length))
-    elif msg.array_mode == "infer":
-      data = buff
     else:
-      raise ValueError("Unrecognized array_mode.")
+      # Consume as much as we can straight from the buffer.
+      data = buff
 
     # Find and empty the array to be populated.
     array = getattr(msg, self.name)
@@ -97,7 +92,6 @@ class VariableStringHandler:
     self.name = field.name
 
   def deserialize(self, buff, msg):
-    # TODO: mechanism to skip length check for Group 26. (grrr)
     length = self.struct_bytes.unpack(buff.read(self.struct_bytes.size))[0]
     setattr(msg, self.name, str(buff.read(length)))
 
@@ -135,11 +129,11 @@ class Translator:
       self.size = self.handlers[0].size
 
   def deserialize(self, buff, msg):
-    try:
+      #try:
       for handler in self.handlers:
         handler.deserialize(buff, msg)
-    except struct.error as e:
-      raise TranslatorError(e)
+        #except struct.error as e:
+        #  raise TranslatorError(e)
 
   def serialize(self, buff, msg):
     for handler in self.handlers:

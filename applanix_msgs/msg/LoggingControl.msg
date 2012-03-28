@@ -1,6 +1,7 @@
 # Msg 51, 52, 61
 uint16 transaction
 
+uint16 groups_count
 OutputGroup[] groups
 
 # 1, 2, 10, 20, 25, 50, 100, 200

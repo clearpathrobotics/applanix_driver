@@ -1,0 +1,31 @@
+# Part of Group 26
+
+uint8 FLAGS_SATELLITE=1
+uint8 FLAGS_STATION_PROVIDING_CORRECTIONS=2
+uint8 FLAGS_STATION_USED_AS_RTCM_SOURCE=4
+uint8 FLAGS_OMNISTAR_STATIONS=8
+uint8 flags
+
+uint16 id
+uint16 frequency
+
+uint8 HEALTH_NORMAL=0
+uint8 HEALTH_NOT_MONITORED=1
+uint8 HEALTH_NO_INFO_AVAILABLE=2
+uint8 HEALTH_DO_NOT_USE=3
+uint8 health
+
+float32 distance
+float32 range
+uint8 uscg_index
+uint32 seconds
+
+uint8 RATE_25BPS=0
+uint8 RATE_50BPS=1
+uint8 RATE_100BPS=2
+uint8 RATE_200BPS=3
+uint8 RATE_600BPS=4
+uint8 RATE_1200BPS=5
+uint8 RATE_2400BPS=6
+uint8 RATE_4800BPS=7
+uint8 modulation_rate

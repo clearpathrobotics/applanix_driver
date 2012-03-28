@@ -16,8 +16,8 @@ with open(all_msgs_filename, "w") as all_msgs_f:
   for msg_num in msgs.keys():
     msg_tuple = msgs[msg_num]
     if msg_tuple:
-      name, msg_cls, opts = msg_tuple
-      if "no_receive" not in opts:
+      name, msg_cls = msg_tuple
+      if msg_cls.in_all_msgs: 
         all_msgs_f.write("applanix_msgs/%s %s\n" % (msg_cls.__name__, name))
 
       if name != "ack":

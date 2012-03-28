@@ -15,8 +15,8 @@ uint8 SOLUTION_OMNISTAR_XP=10
 uint8 SOLUTION_OMNISTAR_VBS=11
 uint8 solution_status
 
-uint8 sv_tracked
-
+uint8 channels_count
+uint16 reserved
 GNSSChannelStatus[] channels
 
 float32 hdop
