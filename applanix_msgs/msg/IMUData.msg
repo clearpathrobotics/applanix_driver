@@ -1,6 +1,12 @@
 TimeDistance td
 
-uint8[24] data
+int32 delta_vel_x
+int32 delta_vel_y
+int32 delta_vel_z
+
+int32 delta_angle_x
+int32 delta_angle_y
+int32 delta_angle_z
 
 # Bitmask
 uint8 STATUS_1_BAD_FRAME=1
