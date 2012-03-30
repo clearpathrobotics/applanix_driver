@@ -1,6 +1,8 @@
 import translator
 import rospy
 
+from applanix_msgs.msg import Ack
+
 
 class Handler:
   def handle(self, data):
@@ -14,19 +16,17 @@ class NullHandler(Handler):
 
 class GroupHandler(Handler):
   def __init__(self, name, data_class):
-    self.translator = translator.get(data_class)
     self.publisher = rospy.Publisher(name, data_class)
 
-  def handle(self, data):
+  def handle(self, buff):
     msg = self.publisher.data_class()
-    self.translator.deserialize(data, msg)
+    msg.translator().deserialize(buff)
     self.publisher.publish(msg)
 
 
 class MessageHandler(Handler):
   def __init__(self, name, data_class, all_msgs):
     self.name = name
-    self.translator = translator.get(data_class)
     if data_class.in_all_msgs:
       self.msg = getattr(all_msgs, name) 
     else:
@@ -35,10 +35,15 @@ class MessageHandler(Handler):
     # Keep a reference to the all_msgs aggregate message.
     self.all_msgs = all_msgs
 
-  def handle(self, data):
-    self.translator.deserialize(data, self.msg)
+  def handle(self, buff):
+    self.msg.translator().deserialize(buff)
     self.all_msgs.last_changed = rospy.get_rostime()
 
 
 class AckHandler(Handler):
-  pass
+  def __init__(self):
+    self.msg = Ack()
+
+  def handle(self, buff):
+    self.msg.translator().deserialize(buff)
+

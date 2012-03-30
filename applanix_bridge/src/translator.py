@@ -13,19 +13,27 @@ class TranslatorError(ValueError):
   pass
 
 
-class SubMessageHandler:
+class Handler(object):
+  def field(self, msg):
+    return getattr(msg, self.name)
+
+  def preserialize(self, msg):
+    pass
+
+
+class SubMessageHandler(Handler):
   def __init__(self, field):
     self.name = field.name
     self.msg_cls = roslib.message.get_message_class(field.type)
-    self.translator = get(self.msg_cls)
 
   def deserialize(self, buff, msg):
-    submessage = self.msg_cls()
-    self.translator.deserialize(buff, submessage)
-    setattr(msg, self.name, submessage)
+    self.field(msg).translator().deserialize(buff)
+
+  def serialize(self, buff, msg):
+    self.field(msg).translator().serialize(buff)
 
 
-class FixedFieldsHandler:
+class FixedFieldsHandler(Handler):
   def __init__(self, fields):
     struct_strs = ['<']
     def pattern(field):
@@ -43,7 +51,7 @@ class FixedFieldsHandler:
     self.size = self.struct.size
 
   def serialize(self, buff, msg):
-    pass
+    buff.write(self.struct.pack(*[getattr(msg, name) for name in self.names])) 
 
   def deserialize(self, buff, msg):
     st = buff.read(self.struct.size)
@@ -53,7 +61,7 @@ class FixedFieldsHandler:
       setattr(msg, name, value)
 
 
-class SubMessageArrayHandler:
+class SubMessageArrayHandler(Handler):
   struct_uint16 = struct.Struct('<H')
   struct_uint8 = struct.Struct('<B')
 
@@ -61,31 +69,39 @@ class SubMessageArrayHandler:
     self.name = field.name
     self.name_count = "%s_count" % self.name
     self.msg_cls = roslib.message.get_message_class(field.base_type)
-    self.translator = get(self.msg_cls)
+    self.submessage_size = self.msg_cls().translator().size
 
   def deserialize(self, buff, msg):
     if hasattr(msg, self.name_count):
       # Another field specifies number of array items to deserialize.
-      length = getattr(msg, self.name_count) * self.translator.size
+      length = getattr(msg, self.name_count) * self.submessage_size 
       data = StringIO(buff.read(length))
     else:
       # Consume as much as we can straight from the buffer.
       data = buff
 
     # Find and empty the array to be populated.
-    array = getattr(msg, self.name)
+    array = self.field(msg)
     array[:] = []
 
     try:
       while True:
         submessage = self.msg_cls()
-        self.translator.deserialize(data, submessage)
+        submessage.translator().deserialize(data)
         array.append(submessage)
     except EndOfBuffer:
       pass
 
+  def serialize(self, buff, msg):
+    for submessage in self.field(msg):
+      submessage.translator().serialize(buff)
 
-class VariableStringHandler:
+  def preserialize(self, msg):
+    if hasattr(msg, self.name_count):
+      setattr(msg, self.name_count, len(self.field(msg)))
+
+
+class VariableStringHandler(Handler):
   struct_bytes = struct.Struct('<H')
 
   def __init__(self, field):
@@ -99,6 +115,7 @@ class VariableStringHandler:
 class Translator:
   def __init__(self, msg_cls):
     self.handlers = []
+    self.size = None
 
     cls_name, spec = roslib.msgs.load_by_type(msg_cls._type)
 
@@ -128,21 +145,36 @@ class Translator:
     if len(self.handlers) == 1 and hasattr(self.handlers[0], 'size'):
       self.size = self.handlers[0].size
 
-  def deserialize(self, buff, msg):
-      #try:
-      for handler in self.handlers:
-        handler.deserialize(buff, msg)
-        #except struct.error as e:
-        #  raise TranslatorError(e)
 
-  def serialize(self, buff, msg):
-    for handler in self.handlers:
-      handler.serialize(buff, msg)
+class TranslatorProxy:
+  def __init__(self, translator, msg):
+    self.translator = translator
+    self.size = translator.size
+    self.msg = msg
+
+  def deserialize(self, buff):
+    try:
+      for handler in self.translator.handlers:
+        handler.deserialize(buff, self.msg)
+    except struct.error as e:
+      raise TranslatorError(e)
+
+  def serialize(self, buff):
+    try:
+      for handler in self.translator.handlers:
+        handler.serialize(buff, self.msg)
+    except struct.error as e:
+      raise TranslatorError(e)
+
+  def preserialize(self):
+    print "FOO"
+    for handler in self.translator.handlers:
+      handler.preserialize(self.msg)
 
 
-def get(msg_cls):
-  # Lazy initialize these, so we don't create them all upfront
-  # when we're only using a few.
-  if not hasattr(msg_cls, "translator"):
-    msg_cls.translator = Translator(msg_cls)
-  return msg_cls.translator
+def translator(self):
+  if not hasattr(self.__class__, "_translator"):
+    self.__class__._translator = Translator(self.__class__)
+  return TranslatorProxy(self.__class__._translator, self)
+
+roslib.message.Message.translator = translator
