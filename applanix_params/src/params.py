@@ -50,7 +50,9 @@ def call_applanix_service(name, req):
 def groups_callback(message):
   req_msg = msg.PortControl()
   req_msg.rate = rospy.get_param('rate', 10)
-  for group_num in message.groups:
+  groups = set(message.groups)
+  groups.add(10)
+  for group_num in groups:
     req_msg.groups.append(msg.OutputGroup(group=group_num))
   call_applanix_service("primary_data_port", req_msg)
   #print message.groups
