@@ -3,7 +3,7 @@
 import rospy
 
 # ROS messages
-import applanix_bridge.msg as common
+import applanix_msgs.msg as msg
 from applanix_ctl.msg import AllMsgs
 
 # Node source
@@ -25,6 +25,8 @@ class DataPort(Port):
     # Aggregate message for republishing the sensor config as a single blob.
     all_msgs = AllMsgs()
     all_msgs_pub = rospy.Publisher("config", AllMsgs, latch=True)
+
+    # 
   
     # Set up handlers for translating different Applanix messages as they arrive.
     handlers = {}
@@ -33,9 +35,9 @@ class DataPort(Port):
       for prefix in self.opts['exclude_prefixes']:
         if groups[group_num][0].startswith(prefix): include = False
       if include:
-        handlers[(common.CommonHeader.START_GROUP, group_num)] = GroupHandler(*groups[group_num])
+        handlers[(msg.CommonHeader.START_GROUP, group_num)] = GroupHandler(*groups[group_num])
     for msg_num in msgs.keys():
-      handlers[(common.CommonHeader.START_MESSAGE, msg_num)] = MessageHandler(*msgs[msg_num], all_msgs=all_msgs)
+      handlers[(msg.CommonHeader.START_MESSAGE, msg_num)] = MessageHandler(*msgs[msg_num], all_msgs=all_msgs)
 
     pkt_counters = {}
     bad_pkts = set()
@@ -72,3 +74,13 @@ class DataPort(Port):
           rospy.get_rostime() > all_msgs.last_changed + self.ALLMSGS_SEND_TIMEOUT:
         all_msgs_pub.publish(all_msgs)
         all_msgs.last_sent = rospy.get_rostime() 
+
+
+class SubscribeListener(rospy.SubscribeListener):
+  def __init__(self):
+    self.lock = Lock()
+    self.topics = set()
+  def peer_subscribe(self, topic_name, topic_publish, peer_publish):
+    pass
+  def peer_unsubscribe(self, topic_name, num_peers):
+    pass

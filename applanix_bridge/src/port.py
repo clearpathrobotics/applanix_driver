@@ -1,5 +1,5 @@
 
-import applanix_bridge.msg as common
+import applanix_msgs.msg as msg
 
 # Node source 
 from translator import Translator
@@ -25,22 +25,16 @@ class Port(threading.Thread):
     self.finish = threading.Event()
 
     # These are only for receiving. 
-    self.header = common.CommonHeader()
-    self.footer = common.CommonFooter()
+    self.header = msg.CommonHeader()
+    self.footer = msg.CommonFooter()
 
   def recv(self, d=False):
     """ Receive a packet from the port's socket.
         Returns (pkt_id, pkt_str), where pkt_id is ("$GRP"|"$MSG", num)
         Returns None, None when no data. """
     try:
-      if d: print "header size",  self.header.translator().size
       header_str = self.sock.recv(self.header.translator().size)
-      if d: print "header len",  len(header_str)
-      if d: print header_str.encode("string_escape")
-      if d and len(header_str) < 8:
-        header_str = self.sock.recv(self.header.translator().size)
     except socket.timeout:
-      print "timeout"
       return None, None
 
     header_data = StringIO(header_str)
@@ -48,7 +42,7 @@ class Port(threading.Thread):
     pkt_id = (str(self.header.start).encode('string_escape'), self.header.id)
 
     # Initial sanity check.
-    if pkt_id[0] not in (common.CommonHeader.START_GROUP, common.CommonHeader.START_MESSAGE):
+    if pkt_id[0] not in (msg.CommonHeader.START_GROUP, msg.CommonHeader.START_MESSAGE):
       raise ValueError("Bad header %s.%d" % pkt_id)
 
     # Special case for a troublesome undocumented packet.
@@ -62,7 +56,7 @@ class Port(threading.Thread):
     # Check package footer.
     footer_data = StringIO(pkt_str[-self.footer.translator().size:])
     self.footer.translator().deserialize(footer_data)
-    if str(self.footer.end) != common.CommonFooter.END:
+    if str(self.footer.end) != msg.CommonFooter.END:
       raise("Bad footer from pkt %s.%d" % pkt_id)
 
     # Check package checksum.
@@ -80,9 +74,8 @@ class Port(threading.Thread):
     pad_count = -msg_buff.tell() % 4
     msg_buff.write("\x00" * pad_count)
 
-    header.length = msg_buff.tell() + self.footer.translator().size
-    print "sendlen", msg_buff.tell() + self.footer.translator().size, msg_buff.tell(), self.footer.translator().size
-    footer = common.CommonFooter(end=common.CommonFooter.END)
+    footer = msg.CommonFooter(end=msg.CommonFooter.END)
+    header.length = msg_buff.tell() + footer.translator().size
 
     # Write header and message to main buffer.
     buff = StringIO()
@@ -101,7 +94,7 @@ class Port(threading.Thread):
     buff.seek(footer_start)
     footer.translator().serialize(buff) 
 
-    print buff.getvalue().encode("string_escape")
+    #print buff.getvalue().encode("string_escape")
     self.sock.send(buff.getvalue())
 
   @classmethod

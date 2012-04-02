@@ -10,7 +10,6 @@ from control import ControlPort
 from monitor import Monitor
 
 # Standard
-from pprint import pprint
 import socket
 import struct
 from cStringIO import StringIO
@@ -25,7 +24,7 @@ PORTS_DATA = {
     }
 PORT_CONTROL = 5601
 
-DEFAULT_IP = '10.25.0.51'
+DEFAULT_IP = '192.168.53.100'
 PREFIX_DEFAULTS = {
     "raw": True,
     "dmi": True,
@@ -100,5 +99,6 @@ def shutdown():
     port.join()
     rospy.loginfo("Port %s thread finished." % name) 
   for sock in socks:
+    sock.shutdown(socket.SHUT_RDWR)
     sock.close()
   rospy.loginfo("Sockets closed.") 

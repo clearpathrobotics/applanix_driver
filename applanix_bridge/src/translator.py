@@ -167,7 +167,6 @@ class TranslatorProxy:
       raise TranslatorError(e)
 
   def preserialize(self):
-    print "FOO"
     for handler in self.translator.handlers:
       handler.preserialize(self.msg)
 
