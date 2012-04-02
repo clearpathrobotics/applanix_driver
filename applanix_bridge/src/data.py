@@ -14,6 +14,7 @@ import translator
 
 # Python
 from cStringIO import StringIO
+from threading import Lock
 
 
 class DataPort(Port):
@@ -24,9 +25,10 @@ class DataPort(Port):
 
     # Aggregate message for republishing the sensor config as a single blob.
     all_msgs = AllMsgs()
-    all_msgs_pub = rospy.Publisher("config", AllMsgs, latch=True)
+    all_msgs_pub = rospy.Publisher("config", AllMsgs, latch=True) 
 
-    # 
+    # Listener object which tracks what topics have been subscribed to.
+    listener = SubscribeListenerManager()
   
     # Set up handlers for translating different Applanix messages as they arrive.
     handlers = {}
@@ -35,7 +37,8 @@ class DataPort(Port):
       for prefix in self.opts['exclude_prefixes']:
         if groups[group_num][0].startswith(prefix): include = False
       if include:
-        handlers[(msg.CommonHeader.START_GROUP, group_num)] = GroupHandler(*groups[group_num])
+        handlers[(msg.CommonHeader.START_GROUP, group_num)] = \
+            GroupHandler(*groups[group_num], listener=listener.listener_for(group_num))
     for msg_num in msgs.keys():
       handlers[(msg.CommonHeader.START_MESSAGE, msg_num)] = MessageHandler(*msgs[msg_num], all_msgs=all_msgs)
 
@@ -76,11 +79,31 @@ class DataPort(Port):
         all_msgs.last_sent = rospy.get_rostime() 
 
 
-class SubscribeListener(rospy.SubscribeListener):
+class SubscribeListenerManager():
   def __init__(self):
     self.lock = Lock()
-    self.topics = set()
-  def peer_subscribe(self, topic_name, topic_publish, peer_publish):
-    pass
-  def peer_unsubscribe(self, topic_name, num_peers):
-    pass
+    self.groups = set()
+    self.publisher = rospy.Publisher("subscribed_groups", msg.Groups, latch=True)
+    self.publish()
+
+  def publish(self):
+    self.publisher.publish(groups=list(self.groups))
+
+  def listener_for(self, group_num):
+    return self.Listener(self, group_num)
+
+  class Listener(rospy.SubscribeListener):
+    def __init__(self, manager, group_num):
+      self.manager = manager
+      self.group_num = group_num
+
+    def peer_subscribe(self, topic_name, topic_publish, peer_publish):
+      with self.manager.lock:
+        self.manager.groups.add(self.group_num)
+        self.manager.publish()
+
+    def peer_unsubscribe(self, topic_name, num_peers):
+      if num_peers == 0:
+        with self.lock:
+          self.manager.groups.discard(self.group_num)
+          self.manager.publish()

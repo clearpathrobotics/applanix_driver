@@ -80,7 +80,6 @@ def create_sock(name, ip, port):
   try:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     ip_port = (ip, port)
-    #if name != "control": 
     sock.connect(ip_port)
     rospy.loginfo("Successfully connected to %%s port at %s:%d" % ip_port % name)
   except socket.error:

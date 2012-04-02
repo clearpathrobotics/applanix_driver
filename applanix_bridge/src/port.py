@@ -65,12 +65,12 @@ class Port(threading.Thread):
 
     return pkt_id, pkt_str 
 
-  def send(self, header, msg):
+  def send(self, header, message):
     """ Sends a header/msg/footer out the socket. Takes care of computing
         length field for header and checksum field for footer. """
     msg_buff = StringIO()
-    msg.translator().preserialize()
-    msg.translator().serialize(msg_buff)
+    message.translator().preserialize()
+    message.translator().serialize(msg_buff)
     pad_count = -msg_buff.tell() % 4
     msg_buff.write("\x00" * pad_count)
 

@@ -10,6 +10,8 @@ response_codes = dict([(val, name) for name, val in msg.Ack.__dict__.items() if 
 
 
 def main():
+  rospy.init_node("applanix_params")
+
   com_ports = rospy.get_param('com_ports', None) 
   if com_ports != None:
     req_msg = msg.COMPortSetup()
@@ -30,6 +32,7 @@ def main():
 
   # Default rate of 10Hz
   rate = rospy.get_param('rate', 10)
+  rospy.Subscriber("subscribed_groups", msg.Groups, groups_callback)
 
   rospy.spin()
 
@@ -42,3 +45,12 @@ def call_applanix_service(name, req):
     rospy.logwarn("Parameter change call to %s resulted in error code %d (%s)." %
                   (name, ack.response_code, response_codes[ack.response_code]))
   return ack
+
+
+def groups_callback(message):
+  req_msg = msg.PortControl()
+  req_msg.rate = rospy.get_param('rate', 10)
+  for group_num in message.groups:
+    req_msg.groups.append(msg.OutputGroup(group=group_num))
+  call_applanix_service("primary_data_port", req_msg)
+  #print message.groups

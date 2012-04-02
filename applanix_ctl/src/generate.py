@@ -24,7 +24,7 @@ with open(all_msgs_filename, "w") as all_msgs_f:
         msg_srv_filename = path.join(pkg_dir, "srv", "%s.srv" % msg_cls.__name__)
         output.append("%s.srv" % msg_cls.__name__)
         with open(msg_srv_filename, "w") as msg_srv_f:
-          msg_srv_f.write("applanix_msgs/%s %s\n" % (msg_cls.__name__, name))
+          msg_srv_f.write("applanix_msgs/%s request\n" % msg_cls.__name__)
           msg_srv_f.write("---\n")
           msg_srv_f.write("applanix_msgs/Ack ack")
 

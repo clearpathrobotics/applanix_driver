@@ -15,35 +15,35 @@ class NullHandler(Handler):
 
 
 class GroupHandler(Handler):
-  def __init__(self, name, data_class):
-    self.publisher = rospy.Publisher(name, data_class)
+  def __init__(self, name, data_class, listener):
+    self.publisher = rospy.Publisher(name, data_class, subscriber_listener=listener)
+    self.message = self.publisher.data_class()
 
   def handle(self, buff):
-    msg = self.publisher.data_class()
-    msg.translator().deserialize(buff)
-    self.publisher.publish(msg)
+    self.message.translator().deserialize(buff)
+    self.publisher.publish(self.message)
 
 
 class MessageHandler(Handler):
   def __init__(self, name, data_class, all_msgs):
     self.name = name
     if data_class.in_all_msgs:
-      self.msg = getattr(all_msgs, name) 
+      self.message = getattr(all_msgs, name) 
     else:
-      self.msg = data_class()
+      self.message = data_class()
 
     # Keep a reference to the all_msgs aggregate message.
     self.all_msgs = all_msgs
 
   def handle(self, buff):
-    self.msg.translator().deserialize(buff)
+    self.message.translator().deserialize(buff)
     self.all_msgs.last_changed = rospy.get_rostime()
 
 
 class AckHandler(Handler):
   def __init__(self):
-    self.msg = Ack()
+    self.message = Ack()
 
   def handle(self, buff):
-    self.msg.translator().deserialize(buff)
+    self.message.translator().deserialize(buff)
 
