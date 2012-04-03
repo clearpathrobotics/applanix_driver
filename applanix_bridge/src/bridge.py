@@ -82,9 +82,9 @@ def create_sock(name, ip, port):
     ip_port = (ip, port)
     sock.connect(ip_port)
     rospy.loginfo("Successfully connected to %%s port at %s:%d" % ip_port % name)
-  except socket.error:
-    rospy.logfatal("Couldn't connect to %%s port at %s:%d." % ip_port % name)
-    raise
+  except socket.error as e:
+    rospy.logfatal("Couldn't connect to %%s port at %s:%d: %%s" % ip_port % (name, str(e)))
+    exit(1)
   socks.append(sock)
   return sock
 

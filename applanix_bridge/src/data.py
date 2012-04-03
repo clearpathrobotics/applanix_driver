@@ -3,8 +3,8 @@
 import rospy
 
 # ROS messages
-import applanix_msgs.msg as msg
-from applanix_ctl.msg import AllMsgs
+import applanix_msgs.msg
+import applanix_generated_msgs.msg
 
 # Node source
 from port import Port
@@ -24,8 +24,8 @@ class DataPort(Port):
     self.sock.settimeout(1.0)
 
     # Aggregate message for republishing the sensor config as a single blob.
-    all_msgs = AllMsgs()
-    all_msgs_pub = rospy.Publisher("config", AllMsgs, latch=True) 
+    all_msgs = applanix_generated_msgs.msg.AllMsgs()
+    all_msgs_pub = rospy.Publisher("config", all_msgs.__class__, latch=True) 
 
     # Listener object which tracks what topics have been subscribed to.
     listener = SubscribeListenerManager()
@@ -37,10 +37,11 @@ class DataPort(Port):
       for prefix in self.opts['exclude_prefixes']:
         if groups[group_num][0].startswith(prefix): include = False
       if include:
-        handlers[(msg.CommonHeader.START_GROUP, group_num)] = \
+        handlers[(applanix_msgs.msg.CommonHeader.START_GROUP, group_num)] = \
             GroupHandler(*groups[group_num], listener=listener.listener_for(group_num))
     for msg_num in msgs.keys():
-      handlers[(msg.CommonHeader.START_MESSAGE, msg_num)] = MessageHandler(*msgs[msg_num], all_msgs=all_msgs)
+      handlers[(applanix_msgs.msg.CommonHeader.START_MESSAGE, msg_num)] = \
+          MessageHandler(*msgs[msg_num], all_msgs=all_msgs)
 
     pkt_counters = {}
     bad_pkts = set()
@@ -83,7 +84,7 @@ class SubscribeListenerManager():
   def __init__(self):
     self.lock = Lock()
     self.groups = set()
-    self.publisher = rospy.Publisher("subscribed_groups", msg.Groups, latch=True)
+    self.publisher = rospy.Publisher("subscribed_groups", applanix_msgs.msg.Groups, latch=True)
     self.publish()
 
   def publish(self):

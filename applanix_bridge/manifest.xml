@@ -10,7 +10,7 @@
   <url>http://ros.org/wiki/applanix_bridge</url>
   <depend package="rospy" />
   <depend package="applanix_msgs" />
-  <depend package="applanix_ctl" />
+  <depend package="applanix_generated_msgs" />
 </package>
 
 
