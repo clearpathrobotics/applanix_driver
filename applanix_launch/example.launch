@@ -1,0 +1,16 @@
+<launch>
+  <group ns="applanix">
+    <rosparam>
+      ip: 10.25.0.51
+      include_raw: false
+      control: true
+      com_ports: [
+        { baud: 115200, input: "BASE_1_GNSS", output: "BASE_1_GNSS" },
+        { baud: 115200, input: "GNSS_1", output: "GNSS_1" },
+        ]
+      rate: 100
+    </rosparam>
+    <node name="applanix_bridge" pkg="applanix_bridge" type="bridge" output="screen" />
+    <node name="applanix_params" pkg="applanix_params" type="params" output="screen" />
+  </group>
+</launch>

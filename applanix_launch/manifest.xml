@@ -1,0 +1,15 @@
+<package>
+  <description brief="applanix_launch">
+
+     applanix_launch
+
+  </description>
+  <author>Mike Purvis</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/applanix_launch</url>
+  <depend package="applanix_bridge" />
+  <depend package="applanix_params" />
+</package>
+
+

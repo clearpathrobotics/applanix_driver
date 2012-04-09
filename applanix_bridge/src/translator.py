@@ -18,32 +18,20 @@ class Handler(object):
   def field(self, msg):
     return getattr(msg, self.name)
 
-  def deserialize(self, buff, msg):
-    """ Read bytes from buff to populate msg. """
-    raise NotImplementedError()
-
-  def serialize(self, buff, msg):
-    """ Write bytes to buff in accordance with contents of msg. """
-    raise NotImplementedError()
-
   def preserialize(self, msg):
-    """ If necessary, populate any length fields or other metadata
-        in preparation for serializing. """
     pass
 
 
 class SubMessageHandler(Handler):
   def __init__(self, field):
     self.name = field.name
+    self.msg_cls = roslib.message.get_message_class(field.type)
 
   def deserialize(self, buff, msg):
-    Translator.for_msg(self.field(msg)).deserialize(buff)
+    self.field(msg).translator().deserialize(buff)
 
   def serialize(self, buff, msg):
-    Translator.for_msg(self.field(msg)).serialize(buff)
-
-  def preserialize(self, msg):
-    Translator.for_msg(self.field(msg)).preserialize()
+    self.field(msg).translator().serialize(buff)
 
 
 class FixedFieldsHandler(Handler):
@@ -64,7 +52,7 @@ class FixedFieldsHandler(Handler):
     self.size = self.struct.size
 
   def serialize(self, buff, msg):
-    buff.write(self.struct.pack(*[getattr(msg, name) for name in self.names]))
+    buff.write(self.struct.pack(*[getattr(msg, name) for name in self.names])) 
 
   def deserialize(self, buff, msg):
     st = buff.read(self.struct.size)
@@ -82,12 +70,12 @@ class SubMessageArrayHandler(Handler):
     self.name = field.name
     self.name_count = "%s_count" % self.name
     self.msg_cls = roslib.message.get_message_class(field.base_type)
-    self.item_size = Translator.for_msg_cls(self.msg_cls).size
+    self.submessage_size = self.msg_cls().translator().size
 
   def deserialize(self, buff, msg):
     if hasattr(msg, self.name_count):
       # Another field specifies number of array items to deserialize.
-      length = getattr(msg, self.name_count) * self.item_size
+      length = getattr(msg, self.name_count) * self.submessage_size 
       data = StringIO(buff.read(length))
     else:
       # Consume as much as we can straight from the buffer.
@@ -100,17 +88,18 @@ class SubMessageArrayHandler(Handler):
     try:
       while True:
         submessage = self.msg_cls()
-        Translator.for_msg(submessage).deserialize(data)
+        submessage.translator().deserialize(data)
         array.append(submessage)
     except EndOfBuffer:
       pass
 
   def serialize(self, buff, msg):
-    pass
+    for submessage in self.field(msg):
+      submessage.translator().serialize(buff)
 
-  def preserialize(self, buff, msg):
+  def preserialize(self, msg):
     if hasattr(msg, self.name_count):
-      setattr(msg, self.name_count, len(field(msg)))
+      setattr(msg, self.name_count, len(self.field(msg)))
 
 
 class VariableStringHandler(Handler):
@@ -127,6 +116,7 @@ class VariableStringHandler(Handler):
 class Translator(object):
   def __init__(self, msg_cls):
     self.handlers = []
+    self.size = None
 
     cls_name, spec = roslib.msgs.load_by_type(msg_cls._type)
 
@@ -156,46 +146,35 @@ class Translator(object):
     if len(self.handlers) == 1 and hasattr(self.handlers[0], 'size'):
       self.size = self.handlers[0].size
 
-  def deserialize(self, buff, msg):
-    try:
-      for handler in self.handlers:
-        handler.deserialize(buff, msg)
-    except struct.error as e:
-      raise TranslatorError(e)
 
-  def serialize(self, buff, msg):
-    try:
-      for handler in self.handlers:
-        handler.serialize(buff, msg)
-    except struct.error as e:
-      raise TranslatorError(e)
-
-  def preserialize(self, msg):
-    for handler in self.handlers:
-      handler.preserialize(msg)
-
-  @classmethod
-  def for_msg_cls(cls, msg_cls):
-    """ Create the translator for a message class. """
-    if not hasattr(msg_cls, "translator"):
-      msg_cls.translator = cls(msg_cls)
-    return msg_cls.translator
-
-  @classmethod
-  def for_msg(cls, msg):
-    """ Return a translator bound to a specific message instance. """
-    return TranslatorProxy(cls.for_msg_cls(msg.__class__), msg)
-
-
-class TranslatorProxy(object):
-  """ Convenience class which binds a translator to a specific msg. """
+class TranslatorProxy:
   def __init__(self, translator, msg):
     self.translator = translator
+    self.size = translator.size
     self.msg = msg
 
-  def __getattr__(self, name):
-    attr = getattr(self.translator, name)
-    if callable(attr): 
-      attr = partial(attr, msg=self.msg)
-    setattr(self, name, attr)
-    return attr
+  def deserialize(self, buff):
+    try:
+      for handler in self.translator.handlers:
+        handler.deserialize(buff, self.msg)
+    except struct.error as e:
+      raise TranslatorError(e)
+
+  def serialize(self, buff):
+    try:
+      for handler in self.translator.handlers:
+        handler.serialize(buff, self.msg)
+    except struct.error as e:
+      raise TranslatorError(e)
+
+  def preserialize(self):
+    for handler in self.translator.handlers:
+      handler.preserialize(self.msg)
+
+
+def translator(self):
+  if not hasattr(self.__class__, "_translator"):
+    self.__class__._translator = Translator(self.__class__)
+  return TranslatorProxy(self.__class__._translator, self)
+
+roslib.message.Message.translator = translator
