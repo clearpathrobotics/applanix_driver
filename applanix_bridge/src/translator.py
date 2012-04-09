@@ -3,7 +3,6 @@ import roslib, roslib.genpy
 import struct
 from itertools import izip
 from cStringIO import StringIO
-from functools import partial
 
 
 class EndOfBuffer(BaseException):
@@ -113,7 +112,7 @@ class VariableStringHandler(Handler):
     setattr(msg, self.name, str(buff.read(length)))
 
 
-class Translator(object):
+class Translator:
   def __init__(self, msg_cls):
     self.handlers = []
     self.size = None

@@ -3,7 +3,7 @@ import roslib; roslib.load_manifest('applanix_msgs')
 from applanix_msgs.msg import *
 
 
-# applanix group number : ( topic name, ROS message class )
+# applanix group number : ( topic name, ROS message class, [opts] )
 groups = {
       1: ("nav", NavigationSolution),
       2: ("status/perf", NavigationPerformance),
@@ -79,7 +79,8 @@ msgs = {
     }
 
 
-# whether message appears in AllMsgs aggregate message
+# in_all_msgs
+# controls whether message appears in AllMsgs aggregate message
 all_msgs_exclude = set([Ack, SaveRestoreControl, InstallationCalibrationControl, 
     GAMSCalibrationControl, ProgramControl, GNSSControl])
 for name, msg in msgs.values():

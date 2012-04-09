@@ -1,11 +1,10 @@
-from translator import Translator
-from applanix_msgs.msg import Ack
+import translator
 import rospy
 
 from applanix_msgs.msg import Ack
 
 
-class Handler(object):
+class Handler:
   def handle(self, data):
     raise NotImplementedError
 
@@ -33,7 +32,7 @@ class MessageHandler(Handler):
     else:
       self.message = data_class()
 
-    # Keep a reference to the all_msgs aggregate message for updating timestamp.
+    # Keep a reference to the all_msgs aggregate message.
     self.all_msgs = all_msgs
 
   def handle(self, buff):
