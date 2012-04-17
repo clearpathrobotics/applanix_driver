@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # ROS
 import roslib; roslib.load_manifest('applanix_bridge')
 import rospy
@@ -54,7 +56,7 @@ class ApplanixPublisher(object):
         rospy.init_node('applanix_publisher')
         # Parameters
         self.publish_tf = rospy.get_param('~publish_tf', False)
-        self.odom_frame = rospy.get_param('~odom_frame', 'odom')
+        self.odom_frame = rospy.get_param('~odom_frame', 'odom_combined')
         self.base_frame = rospy.get_param('~base_frame', 'base_footprint')
 
         # Topic publishers
@@ -62,7 +64,7 @@ class ApplanixPublisher(object):
         self.pub_odom = rospy.Publisher('gps_odom', Odometry)
         self.pub_navsatfix = rospy.Publisher('gps_fix', NavSatFix)
         self.pub_navsatstatus = rospy.Publisher('gps_status', NavSatStatus)
-        if self.publish_tf:
+	if self.publish_tf:
             self.tf_broadcast = tf.TransfromBroadcaster()
 
         # Init nav status
@@ -84,11 +86,12 @@ class ApplanixPublisher(object):
         3) NavSatFix message, for systems which are knowledgeable about GPS stuff
         4) IMU messages
         """
+	rospy.logdebug("Navigation received")
         # If we don't have a fix, don't publish anything...
         if self.nav_status.status == NavSatStatus.STATUS_NO_FIX:
             return
         
-        orient = PyKDL.Rotation.RPY(RAD(data.roll), RAD(data.pitch), RAD(data.yaw)).GetQuaternion()
+        orient = PyKDL.Rotation.RPY(RAD(data.roll), RAD(data.pitch), RAD(data.heading)).GetQuaternion()
 
         # UTM conversion
         (zone, easting, northing) = LLtoUTM(23, data.latitude, data.longitude)
@@ -113,7 +116,7 @@ class ApplanixPublisher(object):
         odom.pose.pose.orientation = Quaternion(*orient)
         odom.pose.covariance = POSE_COVAR
         # Twist is relative to /vehicle frame
-        odom.twist.twist.linear.x = speed
+        odom.twist.twist.linear.x = data.speed
         odom.twist.twist.linear.y = 0
         odom.twist.twist.linear.z = -data.down_vel
         odom.twist.twist.angular.x = RAD(data.ang_rate_long)
@@ -121,12 +124,12 @@ class ApplanixPublisher(object):
         odom.twist.twist.angular.z = RAD(-data.ang_rate_down)
         odom.twist.covariance = TWIST_COVAR
 
-        self.pub_odom(odom)
+        self.pub_odom.publish(odom)
 
         #
         # Odometry transform (if required)
         #
-        if self.publish_tf:
+	if self.publish_tf:
             self.tf_broadcast.sendTransform(
                 (odom.pose.pose.position.x, odom.pose.pose.position.y,
                  odom.pose.pose.position.z), Quaternion(*orient),
@@ -148,7 +151,7 @@ class ApplanixPublisher(object):
         navsat.position_covariance = NAVSAT_COVAR
         navsat.position_covariance_type = NavSatFix.COVARIANCE_TYPE_UNKNOWN
         
-        self.pub_navsatfix(navsat)
+        self.pub_navsatfix.publish(navsat)
         
         #
         # IMU
@@ -185,7 +188,7 @@ class ApplanixPublisher(object):
         solution_map = {
             GNSSStatus.SOLUTION_UNKNOWN: NavSatStatus.STATUS_NO_FIX,
             GNSSStatus.SOLUTION_NO_DATA: NavSatStatus.STATUS_NO_FIX,
-            GNSSStatus.SOLUTION_HORIZONAL_CA: NavSatStatus.STATUS_FIX,
+            GNSSStatus.SOLUTION_HORIZONTAL_CA: NavSatStatus.STATUS_FIX,
             GNSSStatus.SOLUTION_3D_CA: NavSatStatus.STATUS_FIX,
             GNSSStatus.SOLUTION_HORIZONTAL_DGPS: NavSatStatus.STATUS_SBAS_FIX,
             GNSSStatus.SOLUTION_3D_DGPS: NavSatStatus.STATUS_SBAS_FIX,
@@ -206,3 +209,4 @@ class ApplanixPublisher(object):
         
 if __name__ == '__main__':
     node = ApplanixPublisher()
+    rospy.spin()

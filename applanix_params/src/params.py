@@ -30,6 +30,23 @@ def main():
     call_applanix_service("com_port_setup", req_msg)
     rospy.loginfo("Configured COM ports.")
 
+  geometry = rospy.get_param('geometry', None) 
+  if geometry != None:
+    req_msg = applanix_msgs.msg.GeneralParams()
+    for vector_name in ['imu_lever_arm', 'primary_gnss_lever_arm', 'imu_mounting_angle', 'ref_mounting_angle']:
+      if vector_name in geometry:
+        vector = geometry[vector_name]
+        getattr(req_msg, vector_name).x = vector['x']
+        getattr(req_msg, vector_name).y = vector['y']
+        getattr(req_msg, vector_name).z = vector['z']
+    req_msg.time_types = 0x1
+    req_msg.distance_type = 1
+    req_msg.autostart = 1 
+    req_msg.multipath = 2 
+    print req_msg
+    call_applanix_service('general', req_msg)
+    rospy.loginfo("Configured geometry.")
+
   # Default rate of 10Hz
   rate = rospy.get_param('rate', 10)
   rospy.Subscriber("subscribed_groups", applanix_msgs.msg.Groups, groups_callback)

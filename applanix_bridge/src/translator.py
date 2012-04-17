@@ -1,5 +1,6 @@
 
 import roslib, roslib.genpy
+import rospy
 import struct
 from itertools import izip
 from cStringIO import StringIO
@@ -160,6 +161,7 @@ class TranslatorProxy:
       raise TranslatorError(e)
 
   def serialize(self, buff):
+    #rospy.loginfo(str(self.msg))
     try:
       for handler in self.translator.handlers:
         handler.serialize(buff, self.msg)
