@@ -1,7 +1,7 @@
 <launch>
   <group ns="applanix">
     <rosparam>
-      ip: 10.25.0.51
+      ip: 192.168.2.3
       include_raw: false
       control: true
       com_ports: [
