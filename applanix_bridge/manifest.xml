@@ -9,6 +9,11 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/applanix_bridge</url>
   <depend package="rospy" />
+  <depend package="tf" />
+  <depend package="kdl" />
+  <depend package="sensor_msgs" />
+  <depend package="nav_msgs" />
+  <depend package="geometry_msgs" />
   <depend package="applanix_msgs" />
   <depend package="applanix_generated_msgs" />
 </package>
