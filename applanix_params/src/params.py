@@ -30,6 +30,15 @@ def main():
     call_applanix_service("com_port_setup", req_msg)
     rospy.loginfo("Configured COM ports.")
 
+  base_gnss = rospy.get_param('base_gnss', None) 
+  if base_gnss != None:
+    for base_num, base_params in enumerate(base_gnss):
+      base_msg = applanix_msgs.msg.BaseGNSSSetup()
+      base_msg.base_gnss_input_type = getattr(base_msg, "TYPE_%s" % base_params['type'])	
+      base_msg.datum = getattr(base_msg, "DATUM_%s" % base_params['datum'])	
+      call_applanix_service("base_gnss_%i_setup" % (base_num + 1), base_msg)
+      rospy.loginfo("Configured base GNSS #%i." % (base_num + 1))
+
   geometry = rospy.get_param('geometry', None) 
   if geometry != None:
     req_msg = applanix_msgs.msg.GeneralParams()
@@ -43,7 +52,6 @@ def main():
     req_msg.distance_type = 1
     req_msg.autostart = 1 
     req_msg.multipath = 2 
-    print req_msg
     call_applanix_service('general', req_msg)
     rospy.loginfo("Configured geometry.")
 

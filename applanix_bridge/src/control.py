@@ -28,7 +28,8 @@ class ControlPort(Port):
     self.last_transaction_number = 0
 
     for msg_num in mapping.msgs.keys():
-      self.services.append(ServiceHandler(msg_num, self))
+      if msg_num != 0:
+        self.services.append(ServiceHandler(msg_num, self))
     self.services_ready.set()
     
     # Send the navigation mode every n seconds so that the Applanix device
