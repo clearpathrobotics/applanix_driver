@@ -55,6 +55,14 @@ def main():
     call_applanix_service('general', req_msg)
     rospy.loginfo("Configured geometry.")
 
+  sensor_overrides = rospy.get_param('sensor_overrides', None) 
+  if sensor_overrides != None:  
+    override_msg = applanix_msgs.msg.AidingSensorIntegrationControl()
+    for override_str in sensor_overrides:
+      override_msg.override |= getattr(override_msg, "OVERRIDE_%s" % override_str)
+    call_applanix_service("aiding_sensor_integration", override_msg)
+    rospy.loginfo("Configured sensor overrides.")
+
   # Default rate of 10Hz
   rate = rospy.get_param('rate', 10)
   rospy.Subscriber("subscribed_groups", applanix_msgs.msg.Groups, groups_callback)
