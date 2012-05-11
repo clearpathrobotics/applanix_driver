@@ -8,6 +8,7 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/applanix_bridge</url>
+
   <depend package="rospy" />
   <depend package="tf" />
   <depend package="kdl" />
