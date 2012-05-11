@@ -2,7 +2,7 @@
 # ROS
 import rospy
 import applanix_msgs.msg
-from diagnostic_msgs.msg import DiagnosticStatus, KeyValue
+from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
 
 class BitfieldRepublisher(object):
@@ -21,20 +21,21 @@ class BitfieldRepublisher(object):
       flags.append((field, tuple(field_flags)))
     self.flags = tuple(flags)
 
-    self.status_msg = DiagnosticStatus()
-    self.status_msg.level = DiagnosticStatus.OK
-    self.status_msg.name = "Applanix AP10"
-    self.status_msg.message = "OK"
+    self.status_msg = DiagnosticArray()
+    self.status_msg.status.append(DiagnosticStatus(
+      level = DiagnosticStatus.OK,
+      name = "Applanix AP10",
+      message = "OK"))
     rospy.Subscriber(topic_name, topic_type, self._cb)
-    self.pub = rospy.Publisher("/diagnostics", DiagnosticStatus, latch=True)
+    self.pub = rospy.Publisher("/diagnostics", DiagnosticArray, latch=True)
 
   def _cb(self, msg):
-    self.status_msg.values = []
+    self.status_msg.status[0].values = []
     for field, field_flags in self.flags:
       field_value = getattr(msg, field)
       for mask, flag in field_flags:
-        value = str(int(field_value & mask != 0))
-        self.status_msg.values.append(KeyValue(flag, value))
+        value = str(int((field_value & mask) != 0))
+        self.status_msg.status[0].values.append(KeyValue(flag, value))
     self.pub.publish(self.status_msg) 
 
 
