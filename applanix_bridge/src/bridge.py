@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-
-import roslib; roslib.load_manifest('applanix_bridge')
 
 # ROS
 import rospy

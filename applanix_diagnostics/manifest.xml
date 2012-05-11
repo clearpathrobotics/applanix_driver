@@ -1,0 +1,17 @@
+<package>
+  <description brief="applanix_diagnostics">
+
+     applanix_diagnostics
+
+  </description>
+  <author>Administrator</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/applanix_diagnostics</url>
+
+  <depend package="rospy" />
+  <depend package="applanix_msgs" />
+  <depend package="diagnostic_msgs" />
+</package>
+
+

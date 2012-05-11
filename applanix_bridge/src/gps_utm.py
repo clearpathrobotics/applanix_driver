@@ -1,7 +1,5 @@
-#!/usr/bin/env python
 
 # Lat Long - UTM, UTM - Lat Long conversions
-
 from math import pi, sin, cos, tan, sqrt
 
 #LatLong- UTM conversion..h
