@@ -58,6 +58,7 @@ class ApplanixPublisher(object):
         self.publish_tf = rospy.get_param('~publish_tf', False)
         self.odom_frame = rospy.get_param('~odom_frame', 'odom_combined')
         self.base_frame = rospy.get_param('~base_frame', 'base_footprint')
+        self.zero_start = rospy.get_param('~zero_start', False)
 
         # Topic publishers
         self.pub_imu = rospy.Publisher('imu_data', Imu)
@@ -97,7 +98,7 @@ class ApplanixPublisher(object):
         (zone, easting, northing) = LLtoUTM(23, data.latitude, data.longitude)
         # Initialize starting point if we haven't yet
         # TODO: Do we want to follow UTexas' lead and reinit to a nonzero point within the same UTM grid?
-        if not self.init:
+        if not self.init and self.zero_start:
             self.origin.x = easting
             self.origin.y = northing
             self.init = True
