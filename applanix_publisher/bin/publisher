@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+import roslib; roslib.load_manifest('applanix_publisher')
+import publisher
+publisher.main()

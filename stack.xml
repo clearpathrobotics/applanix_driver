@@ -3,9 +3,10 @@
   <author>Maintained by Mike Purvis</author>
   <license>BSD</license>  
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/applanix</url>
-  <depend stack="common_msgs" /> <!-- geometry_msgs -->
+  <url>http://ros.org/wiki/applanix_driver</url>
+  <depend stack="common_msgs" /> <!-- nav_msgs, geometry_msgs, sensor_msgs, diagnostic_msgs -->
+  <depend stack="geometry" /> <!-- tf -->
+  <depend stack="orocos_kinematics_dynamics" /> <!-- kdl -->
   <depend stack="ros" />
   <depend stack="ros_comm" /> <!-- rospy -->
-
 </stack>

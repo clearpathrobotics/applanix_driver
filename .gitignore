@@ -1,6 +1,7 @@
 *.swp
 *.pyc
 *.swo
+*.bak
 msg_gen
 srv_gen
 build

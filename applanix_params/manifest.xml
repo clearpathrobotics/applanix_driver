@@ -1,8 +1,8 @@
 <package>
   <description brief="applanix_params">
-
-     applanix_params
-
+    Contains a node which reads standard ROS parameters and interacts
+    the service interface in the applanix_bridge node to configure an
+    Applanix device.
   </description>
   <author>Mike Purvis</author>
   <license>BSD</license>

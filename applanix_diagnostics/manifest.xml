@@ -1,8 +1,7 @@
 <package>
   <description brief="applanix_diagnostics">
-
-     applanix_diagnostics
-
+    Publisher which translates Applanix status bitfields into standard ROS messages
+    on the /diagnostics topic.
   </description>
   <author>Administrator</author>
   <license>BSD</license>

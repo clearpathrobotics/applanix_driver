@@ -1,6 +1,6 @@
 <package>
   <description brief="applanix_msgs">
-    applanix_msgs
+    ROS messages which represent the serialized wire messages and groups of Applanix devices.
   </description>
   <author>Mike Purvis</author>
   <license>BSD</license>

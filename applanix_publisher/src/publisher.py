@@ -41,7 +41,7 @@
 #
 
 # ROS
-import roslib; roslib.load_manifest('applanix_bridge')
+import roslib; roslib.load_manifest('applanix_publisher')
 import rospy
 import tf
 import PyKDL
@@ -103,10 +103,10 @@ class ApplanixPublisher(object):
         # Topic publishers
         self.pub_imu = rospy.Publisher('imu_data', Imu)
         self.pub_odom = rospy.Publisher('gps_odom', Odometry)
-	self.pub_origin = rospy.Publisher('origin', Pose)
+        self.pub_origin = rospy.Publisher('origin', Pose)
         self.pub_navsatfix = rospy.Publisher('gps_fix', NavSatFix)
         self.pub_navsatstatus = rospy.Publisher('gps_status', NavSatStatus)
-	if self.publish_tf:
+        if self.publish_tf:
             self.tf_broadcast = tf.TransfromBroadcaster()
 
         # Init nav status
@@ -128,7 +128,7 @@ class ApplanixPublisher(object):
         3) NavSatFix message, for systems which are knowledgeable about GPS stuff
         4) IMU messages
         """
-	rospy.logdebug("Navigation received")
+        rospy.logdebug("Navigation received")
         # If we don't have a fix, don't publish anything...
         if self.nav_status.status == NavSatStatus.STATUS_NO_FIX:
             return
@@ -177,7 +177,7 @@ class ApplanixPublisher(object):
         #
         # Odometry transform (if required)
         #
-	if self.publish_tf:
+        if self.publish_tf:
             self.tf_broadcast.sendTransform(
                 (odom.pose.pose.position.x, odom.pose.pose.position.y,
                  odom.pose.pose.position.z), Quaternion(*orient),
@@ -254,7 +254,8 @@ class ApplanixPublisher(object):
         self.nav_status.service = NavSatStatus.SERVICE_GPS
             
         self.pub_navsatstatus.publish(self.nav_status)
-        
-if __name__ == '__main__':
+
+
+def main():
     node = ApplanixPublisher()
     rospy.spin()
