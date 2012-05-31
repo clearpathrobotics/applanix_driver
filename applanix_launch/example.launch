@@ -18,5 +18,6 @@
     <node name="applanix_bridge" pkg="applanix_bridge" type="bridge" />
     <node name="applanix_params" pkg="applanix_params" type="params" />
     <node name="applanix_publisher" pkg="applanix_publisher" type="publisher" />
+    <node name="applanix_diagnostics" pkg="applanix_diagnostics" type="diagnostics_publisher" />
   </group>
 </launch>
