@@ -67,7 +67,7 @@ class TestSmoke(unittest.TestCase):
   receivers = {}
 
   def test_diagnostics(self):
-    self.assertGreater(len(self.receivers['diag'].msgs), 70)
+    self.assertTrue(len(self.receivers['diag'].msgs) > 70)
     fields = {}
     for msg in self.receivers['diag'].msgs:
       for field in msg.status[0].values:
@@ -78,7 +78,7 @@ class TestSmoke(unittest.TestCase):
     self.assertEqual(fields['FULL_NAVIGATION_SOLUTION'], '0')
 
   def test_navigation(self):
-    self.assertGreater(len(self.receivers['nav'].msgs), 70)
+    self.assertTrue(len(self.receivers['nav'].msgs) > 70)
     msg = self.receivers['nav'].msgs[-1]
     self.assertAlmostEqual(msg.latitude, 44.2449408681)
     self.assertAlmostEqual(msg.longitude, -76.5096210157)
@@ -87,13 +87,13 @@ class TestSmoke(unittest.TestCase):
     self.assertAlmostEqual(msg.heading, 20.812475085)
 
   def test_fix(self):
-    self.assertGreater(len(self.receivers['fix'].msgs), 70)
+    self.assertTrue(len(self.receivers['fix'].msgs) > 70)
     msg = self.receivers['fix'].msgs[-1]
     self.assertAlmostEqual(msg.latitude, 44.2449408681)
     self.assertAlmostEqual(msg.longitude, -76.5096210157) 
 
   def test_imu(self):
-    self.assertGreater(len(self.receivers['imu'].msgs), 70)
+    self.assertTrue(len(self.receivers['imu'].msgs) > 70)
     msg = self.receivers['imu'].msgs[-1]
     self.assertAlmostEqual(msg.angular_velocity.x, -0.000960592777497)
     self.assertAlmostEqual(msg.linear_acceleration.y, 0.0397075638175) 
