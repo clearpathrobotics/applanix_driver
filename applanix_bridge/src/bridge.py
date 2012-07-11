@@ -102,8 +102,17 @@ def main():
     if not rospy.get_param('include_%s' % prefix, default):
       exclude_prefixes.append(prefix)
 
-  ports['data'] = DataPort(create_sock('data', ip, data_port),
-                           exclude_prefixes=exclude_prefixes)
+  # Pass this parameter to use pcap data rather than a socket to a device.
+  # For testing the node itself--to exercise downstream algorithms, use a bag.
+  pcap_file_name = rospy.get_param('pcap_file', False)
+
+  if not pcap_file_name:
+    sock = create_sock('data', ip, data_port)
+  else:
+    sock = create_test_sock(pcap_file_name)
+
+  ports['data'] = DataPort(sock, exclude_prefixes=exclude_prefixes)
+
   if control_enabled:
     ports['control'] = ControlPort(create_sock('control', ip, PORT_CONTROL))
 
@@ -127,6 +136,38 @@ def create_sock(name, ip, port):
     exit(1)
   socks.append(sock)
   return sock
+
+
+def create_test_sock(pcap_filename):
+  rospy.sleep(0.1)
+
+  import pcapy
+  from StringIO import StringIO
+  from impacket import ImpactDecoder
+
+  body_list = []
+  cap = pcapy.open_offline(pcap_filename)
+  decoder = ImpactDecoder.EthDecoder()
+
+  while True:
+    header, payload = cap.next()
+    if not header: break
+    udp = decoder.decode(payload).child().child()
+    body_list.append(udp.child().get_packet())
+
+  data_io = StringIO(''.join(body_list))
+
+  class MockSocket(object):
+    def recv(self, byte_count):
+      rospy.sleep(0.0001)
+      data = data_io.read(byte_count)
+      if data == "":
+        rospy.signal_shutdown("Test completed.")
+      return data  
+    def settimeout(self, timeout):
+      pass
+
+  return MockSocket()
 
 
 def shutdown():
