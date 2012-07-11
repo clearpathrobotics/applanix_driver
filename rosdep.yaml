@@ -1,0 +1,4 @@
+python-pcapy:
+  ubuntu: python-pcapy
+python-impacket:
+  ubuntu: python-impacket
