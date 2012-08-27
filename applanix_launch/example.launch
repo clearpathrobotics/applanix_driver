@@ -1,7 +1,8 @@
 <launch>
   <group ns="applanix">
+    <!-- Default IP -->
     <rosparam>
-      ip: 192.168.2.3  
+      ip: 192.168.53.100
       include_raw: false
       control: true
       com_ports: [
@@ -10,10 +11,13 @@
         ]
       geometry:
         imu_mounting_angle: { x: 0, y: -90, z: 0 }
+        imu_lever_arm: { x: 0, y: 0, z: 0 }
+        primary_gnss_lever_arm: { x: 0.5, y: 0.0, z: -0.5 }
       rate: 100
     </rosparam>
-    <node name="applanix_bridge" pkg="applanix_bridge" type="bridge" output="screen" />
-    <node name="applanix_params" pkg="applanix_params" type="params" output="screen" />
-    <node name="applanix_publisher" pkg="applanix_bridge" type="common_publisher" />
+    <node name="applanix_bridge" pkg="applanix_bridge" type="bridge" />
+    <node name="applanix_params" pkg="applanix_params" type="params" />
+    <node name="applanix_publisher" pkg="applanix_publisher" type="publisher" />
+    <node name="applanix_diagnostics" pkg="applanix_diagnostics" type="diagnostics_publisher" />
   </group>
 </launch>

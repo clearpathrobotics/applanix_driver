@@ -1,0 +1,21 @@
+<package>
+  <description brief="applanix_test">
+     Basic tests for Applanix driver nodes.
+  </description>
+  <author>Mike Purvis</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/applanix_test</url>
+  <rosdep name="python-pcapy" />
+  <rosdep name="python-impacket" />
+  <depend package="rospy" />
+  <depend package="rostest" />
+  <depend package="diagnostic_msgs" />
+  <depend package="sensor_msgs" />
+  <depend package="applanix_bridge" />
+  <depend package="applanix_params" />
+  <depend package="applanix_msgs" />
+  <depend package="applanix_generated_msgs" />
+</package>
+
+

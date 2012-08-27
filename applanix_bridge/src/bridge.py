@@ -1,3 +1,44 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+#     _____
+#    /  _  \
+#   / _/ \  \
+#  / / \_/   \
+# /  \_/  _   \  ___  _    ___   ___   ____   ____   ___   _____  _   _
+# \  / \_/ \  / /  _\| |  | __| / _ \ | ┌┐ \ | ┌┐ \ / _ \ |_   _|| | | |
+#  \ \_/ \_/ /  | |  | |  | └─┐| |_| || └┘ / | └┘_/| |_| |  | |  | └─┘ |
+#   \  \_/  /   | |_ | |_ | ┌─┘|  _  || |\ \ | |   |  _  |  | |  | ┌─┐ |
+#    \_____/    \___/|___||___||_| |_||_| \_\|_|   |_| |_|  |_|  |_| |_|
+#            ROBOTICS™
+#
+#
+#  Copyright © 2012 Clearpath Robotics, Inc. 
+#  All Rights Reserved
+#  
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Clearpath Robotics, Inc. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL CLEARPATH ROBOTICS, INC. BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Please send comments, questions, or patches to skynet@clearpathrobotics.com
+#
 
 # ROS
 import rospy
@@ -61,8 +102,17 @@ def main():
     if not rospy.get_param('include_%s' % prefix, default):
       exclude_prefixes.append(prefix)
 
-  ports['data'] = DataPort(create_sock('data', ip, data_port),
-                           exclude_prefixes=exclude_prefixes)
+  # Pass this parameter to use pcap data rather than a socket to a device.
+  # For testing the node itself--to exercise downstream algorithms, use a bag.
+  pcap_file_name = rospy.get_param('pcap_file', False)
+
+  if not pcap_file_name:
+    sock = create_sock('data', ip, data_port)
+  else:
+    sock = create_test_sock(pcap_file_name)
+
+  ports['data'] = DataPort(sock, exclude_prefixes=exclude_prefixes)
+
   if control_enabled:
     ports['control'] = ControlPort(create_sock('control', ip, PORT_CONTROL))
 
@@ -86,6 +136,38 @@ def create_sock(name, ip, port):
     exit(1)
   socks.append(sock)
   return sock
+
+
+def create_test_sock(pcap_filename):
+  rospy.sleep(0.1)
+
+  import pcapy
+  from StringIO import StringIO
+  from impacket import ImpactDecoder
+
+  body_list = []
+  cap = pcapy.open_offline(pcap_filename)
+  decoder = ImpactDecoder.EthDecoder()
+
+  while True:
+    header, payload = cap.next()
+    if not header: break
+    udp = decoder.decode(payload).child().child()
+    body_list.append(udp.child().get_packet())
+
+  data_io = StringIO(''.join(body_list))
+
+  class MockSocket(object):
+    def recv(self, byte_count):
+      rospy.sleep(0.0001)
+      data = data_io.read(byte_count)
+      if data == "":
+        rospy.signal_shutdown("Test completed.")
+      return data  
+    def settimeout(self, timeout):
+      pass
+
+  return MockSocket()
 
 
 def shutdown():

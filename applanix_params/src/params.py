@@ -1,4 +1,44 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+#     _____
+#    /  _  \
+#   / _/ \  \
+#  / / \_/   \
+# /  \_/  _   \  ___  _    ___   ___   ____   ____   ___   _____  _   _
+# \  / \_/ \  / /  _\| |  | __| / _ \ | ┌┐ \ | ┌┐ \ / _ \ |_   _|| | | |
+#  \ \_/ \_/ /  | |  | |  | └─┐| |_| || └┘ / | └┘_/| |_| |  | |  | └─┘ |
+#   \  \_/  /   | |_ | |_ | ┌─┘|  _  || |\ \ | |   |  _  |  | |  | ┌─┐ |
+#    \_____/    \___/|___||___||_| |_||_| \_\|_|   |_| |_|  |_|  |_| |_|
+#            ROBOTICS™
+#
+#
+#  Copyright © 2012 Clearpath Robotics, Inc. 
+#  All Rights Reserved
+#  
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Clearpath Robotics, Inc. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL CLEARPATH ROBOTICS, INC. BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Please send comments, questions, or patches to skynet@clearpathrobotics.com
+#
 
 # ROS
 import rospy
@@ -51,23 +91,34 @@ def main():
     req_msg.time_types = 0x1
     req_msg.distance_type = 1
     req_msg.autostart = 1 
-    req_msg.multipath = 2 
+    req_msg.multipath = 0  # LOW setting, do not change. 
     call_applanix_service('general', req_msg)
     rospy.loginfo("Configured geometry.")
-
-  sensor_overrides = rospy.get_param('sensor_overrides', None) 
-  if sensor_overrides != None:  
-    override_msg = applanix_msgs.msg.AidingSensorIntegrationControl()
-    for override_str in sensor_overrides:
-      override_msg.override |= getattr(override_msg, "OVERRIDE_%s" % override_str)
-    call_applanix_service("aiding_sensor_integration", override_msg)
-    rospy.loginfo("Configured sensor overrides.")
 
   # Default rate of 10Hz
   rate = rospy.get_param('rate', 10)
   rospy.Subscriber("subscribed_groups", applanix_msgs.msg.Groups, groups_callback)
 
+  # Delay setting the sensor override msg until we have received notice that Fine Align is active.
+  sensor_overrides = rospy.get_param('sensor_overrides', None) 
+  if sensor_overrides != None:
+    override_msg = applanix_msgs.msg.AidingSensorIntegrationControl()
+    for override_str in sensor_overrides:
+      override_msg.override |= getattr(override_msg, "OVERRIDE_%s" % override_str)
+    rospy.loginfo("Waiting on Fine Align before configuring sensor overrides.")
+    proceed = [False]
+    def _cb(msg):
+      if msg.status_a & applanix_msgs.msg.GeneralStatus.STATUS_A_FINE_ALIGN_ACTIVE != 0:
+        proceed[0] = True
+    sub = rospy.Subscriber("status/general", applanix_msgs.msg.GeneralStatus, _cb)
+    while not proceed[0]:
+      rospy.sleep(1.)
+    sub.unregister()
+    call_applanix_service("aiding_sensor_integration", override_msg)
+    rospy.loginfo("Configured sensor overrides.")
+
   rospy.spin()
+ 
 
 
 def call_applanix_service(name, req):

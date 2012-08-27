@@ -1,8 +1,6 @@
 <package>
   <description brief="applanix_launch">
-
-     applanix_launch
-
+    Contains an example launch file for an AP10 with some of the supported configuration parameters.
   </description>
   <author>Mike Purvis</author>
   <license>BSD</license>
