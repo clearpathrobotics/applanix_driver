@@ -40,7 +40,8 @@
 # Please send comments, questions, or patches to skynet@clearpathrobotics.com
 #
 
-import roslib, roslib.genpy
+import roslib, roslib.message, roslib.msgs
+import genpy
 import rospy
 import struct
 from itertools import izip
@@ -80,7 +81,7 @@ class FixedFieldsHandler(Handler):
     struct_strs = ['<']
     def pattern(field):
       try:
-        return roslib.genpy.SIMPLE_TYPES_DICT[field.type]
+        return genpy.base.SIMPLE_TYPES_DICT[field.type]
       except KeyError:
         if field.base_type in ['uint8', 'char'] and field.array_len is not None:
           return "%is" % field.array_len
@@ -163,7 +164,7 @@ class Translator:
 
     fixed_fields = []
     for field in spec.parsed_fields():
-      if roslib.genpy.is_simple(field.base_type) and (field.array_len != None or not field.is_array):
+      if genpy.base.is_simple(field.base_type) and (field.array_len != None or not field.is_array):
         # Simple types and fixed-length character arrays.
         fixed_fields.append(field)
       else:
