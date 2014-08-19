@@ -41,6 +41,7 @@
 #
 
 import genpy.message, genpy.base
+import roslib.msgs
 
 import rospy
 import struct
@@ -111,7 +112,7 @@ class SubMessageArrayHandler(Handler):
   def __init__(self, field):
     self.name = field.name
     self.name_count = "%s_count" % self.name
-    self.msg_cls = roslib.message.get_message_class(field.base_type)
+    self.msg_cls = genpy.message.get_message_class(field.base_type)
     self.submessage_size = self.msg_cls().translator().size
 
   def deserialize(self, buff, msg):
