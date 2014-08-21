@@ -40,13 +40,12 @@
 # Please send comments, questions, or patches to skynet@clearpathrobotics.com
 #
 
-import roslib; roslib.load_manifest('applanix_generated_msgs')
 from roslib.packages import get_pkg_dir
 from mapping import groups, msgs
 from os import path
 from sys import stdout
 
-pkg_dir = get_pkg_dir('applanix_generated_msgs')
+pkg_dir = get_pkg_dir('applanix_msgs')
 output = []
 
 all_msgs_filename = path.join(pkg_dir, "msg", "AllMsgs.msg")
