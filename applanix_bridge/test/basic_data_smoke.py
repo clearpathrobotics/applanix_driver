@@ -40,13 +40,10 @@
 # Please send comments, questions, or patches to skynet@clearpathrobotics.com
 #
 
-PKG='applanix_test'
-
-import roslib; roslib.load_manifest(PKG)
 import rospy
 
 from applanix_msgs.msg import NavigationSolution
-from applanix_generated_msgs.msg import AllMsgs
+from applanix_srvs.msg import AllMsgs
 from diagnostic_msgs.msg import DiagnosticArray
 from sensor_msgs.msg import NavSatFix, Imu
 
@@ -118,5 +115,5 @@ if __name__ == '__main__':
   TestSmoke.receivers['cfg'] = MessageReceiver('config', AllMsgs)
   rospy.sleep(3.0)
 
-  rostest.rosrun(PKG, 'test_smoke', TestSmoke)
+  rostest.rosrun('applanix_bridge', 'test_smoke', TestSmoke)
 

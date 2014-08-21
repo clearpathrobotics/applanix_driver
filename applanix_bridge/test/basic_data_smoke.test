@@ -4,12 +4,12 @@
       include_raw: true
       control: false
     </rosparam>
-    <param name="pcap_file" value="$(find applanix_test)/pcap/basic_data_smoke.pcap" />
+    <param name="pcap_file" value="$(find applanix_bridge)/test/basic_data_smoke.pcap" />
     <node name="applanix_bridge" pkg="applanix_bridge" type="bridge" output="screen" />
-    <node name="applanix_publisher" pkg="applanix_publisher" type="publisher" />
-    <node name="applanix_diagnostics" pkg="applanix_diagnostics" type="diagnostics_publisher" />
+    <node name="applanix_publisher" pkg="applanix_bridge" type="publisher" />
+    <node name="applanix_diagnostics" pkg="applanix_bridge" type="diagnostics_publisher" />
 
-    <test name="applanix_test" pkg="applanix_test" type="basic_data_smoke.py"
+    <test name="applanix_test" pkg="applanix_bridge" type="basic_data_smoke.py"
           test-name="basic_smoke" time-limit="10.0" />
 
     <!-- <node name="applanix_test" pkg="applanix_test" type="basic_data_smoke.py" output="screen"
