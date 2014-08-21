@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
 #  common_msgs
   diagnostic_msgs
 #  geometry
+  applanix_msgs
 #  orocos_kinematics_dynamics
   rospy
 )
