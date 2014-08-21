@@ -41,7 +41,6 @@
 #
 
 # ROS
-import roslib; roslib.load_manifest('applanix_publisher')
 import rospy
 import tf
 import PyKDL
