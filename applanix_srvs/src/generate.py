@@ -45,7 +45,7 @@ from mapping import groups, msgs
 from os import path
 from sys import stdout
 
-pkg_dir = get_pkg_dir('applanix_msgs')
+pkg_dir = get_pkg_dir('applanix_srvs')
 output = []
 
 all_msgs_filename = path.join(pkg_dir, "msg", "AllMsgs.msg")
