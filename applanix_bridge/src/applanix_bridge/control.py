@@ -44,13 +44,13 @@
 import rospy
 
 # ROS messages and services
-import applanix_generated_msgs.srv
+import applanix_srvs.srv
 import applanix_msgs.msg
 
 # Node
 from port import Port
 from handlers import AckHandler
-import mapping
+from applanix_msgs import mapping
 
 # Python
 import threading
@@ -75,7 +75,7 @@ class ControlPort(Port):
     
     # Send the navigation mode every n seconds so that the Applanix device
     # doesn't close the connection on us.
-    set_nav_mode = rospy.ServiceProxy("nav_mode", applanix_generated_msgs.srv.NavModeControl)
+    set_nav_mode = rospy.ServiceProxy("nav_mode", applanix_srvs.srv.NavModeControl)
     nav_mode_msg = applanix_msgs.msg.NavModeControl(mode=applanix_msgs.msg.NavModeControl.MODE_NAVIGATE)
     while not self.finish.is_set():
       rospy.sleep(SILENCE_INTERVAL)
@@ -90,7 +90,7 @@ class ServiceHandler(object):
   def __init__(self, msg_num, port):
     self.name, data_class = mapping.msgs[msg_num]
     self.port = port
-    self.service = rospy.Service(self.name, getattr(applanix_generated_msgs.srv, data_class.__name__), self.handle)
+    self.service = rospy.Service(self.name, getattr(applanix_srvs.srv, data_class.__name__), self.handle)
 
     # Part of the outbound message to Applanix device.
     self.header = applanix_msgs.msg.CommonHeader(start=applanix_msgs.msg.CommonHeader.START_MESSAGE, id=msg_num, length=0)

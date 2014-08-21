@@ -41,7 +41,7 @@
 #
 
 from roslib.packages import get_pkg_dir
-from mapping import groups, msgs
+from applanix_msgs.mapping import groups, msgs
 from os import path
 from sys import stdout
 

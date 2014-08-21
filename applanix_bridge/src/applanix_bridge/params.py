@@ -44,7 +44,7 @@
 import rospy
 import roslib.message
 import applanix_msgs.msg
-import applanix_generated_msgs.srv 
+import applanix_srvs.srv 
 
 response_codes = dict([(val, name) for name, val in applanix_msgs.msg.Ack.__dict__.items() if name.startswith("RESPONSE_")])
 
@@ -111,7 +111,7 @@ def main():
 
 
 def call_applanix_service(name, req):
-  service_defn = getattr(applanix_generated_msgs.srv, req.__class__.__name__)
+  service_defn = getattr(applanix_srvs.srv, req.__class__.__name__)
   rospy.wait_for_service(name)
   ack = rospy.ServiceProxy(name, service_defn)(req).ack
   if ack.response_code != applanix_msgs.msg.Ack.RESPONSE_ACCEPTED:

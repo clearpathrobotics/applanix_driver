@@ -45,11 +45,11 @@ import rospy
 
 # ROS messages
 import applanix_msgs.msg
-import applanix_generated_msgs.msg
+import applanix_srvs.msg
 
 # Node source
 from port import Port
-from mapping import groups, msgs
+from applanix_msgs.mapping import groups, msgs
 from handlers import GroupHandler, MessageHandler
 import translator
 
@@ -65,7 +65,7 @@ class DataPort(Port):
     self.sock.settimeout(1.0)
 
     # Aggregate message for republishing the sensor config as a single blob.
-    all_msgs = applanix_generated_msgs.msg.AllMsgs()
+    all_msgs = applanix_srvs.msg.AllMsgs()
     all_msgs_pub = rospy.Publisher("config", all_msgs.__class__, latch=True) 
 
     # Listener object which tracks what topics have been subscribed to.
