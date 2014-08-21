@@ -5,7 +5,5 @@
 msg_gen
 srv_gen
 build
-applanix_msgs/src/applanix_msgs
-applanix_generated_msgs/src/applanix_generated_msgs
-applanix_generated_msgs/srv/*
-applanix_generated_msgs/msg/*
+applanix_srvs/srv/*
+applanix_srvs/msg/*
