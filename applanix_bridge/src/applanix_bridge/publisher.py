@@ -47,7 +47,7 @@ import PyKDL
 
 # Applanix node internal messages & modules
 from applanix_msgs.msg import NavigationSolution, GNSSStatus, IMUData
-from gps_utm import LLtoUTM
+import geodesy.utm
 
 # ROS standard messages
 from sensor_msgs.msg import Imu, NavSatFix, NavSatStatus
@@ -135,12 +135,12 @@ class ApplanixPublisher(object):
         orient = PyKDL.Rotation.RPY(RAD(data.roll), RAD(data.pitch), RAD(data.heading)).GetQuaternion()
 
         # UTM conversion
-        (zone, easting, northing) = LLtoUTM(23, data.latitude, data.longitude)
+        utm_pos = geodesy.utm.fromLatLong(data.latitude, data.longitude)
         # Initialize starting point if we haven't yet
         # TODO: Do we want to follow UTexas' lead and reinit to a nonzero point within the same UTM grid?
         if not self.init and self.zero_start:
-            self.origin.x = easting
-            self.origin.y = northing
+            self.origin.x = utm_pos.easting
+            self.origin.y = utm_pos.northing
             self.init = True
 
         # Publish origin reference for others to know about
@@ -157,8 +157,8 @@ class ApplanixPublisher(object):
         odom.header.stamp = rospy.Time.now()
         odom.header.frame_id = self.odom_frame
         odom.child_frame_id = self.base_frame
-        odom.pose.pose.position.x = easting - self.origin.x
-        odom.pose.pose.position.y = northing - self.origin.y
+        odom.pose.pose.position.x = utm_pos.easting - self.origin.x
+        odom.pose.pose.position.y = utm_pos.northing - self.origin.y
         odom.pose.pose.position.z = data.altitude
         odom.pose.pose.orientation = Quaternion(*orient)
         odom.pose.covariance = POSE_COVAR
