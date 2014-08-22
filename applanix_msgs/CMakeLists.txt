@@ -7,6 +7,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
 )
 
+# this is needed because this module includes a python library for inspecting
+# the message mappings to Applanix.
 catkin_python_setup()
 
 ## Generate messages in the 'msg' folder
