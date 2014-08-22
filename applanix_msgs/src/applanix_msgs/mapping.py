@@ -39,7 +39,6 @@
 #
 # Please send comments, questions, or patches to skynet@clearpathrobotics.com
 #
-import roslib; roslib.load_manifest('applanix_msgs')
 from applanix_msgs.msg import *
 
 
