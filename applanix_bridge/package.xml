@@ -8,7 +8,7 @@
     re-implemented using roscpp if performance is a bottleneck.
   </description>
 
-  <maintainer email="mpurvis@clearpathrobotics.com">Mike Purvis</maintainer>
+  <maintainer email="kshehata@clearpathrobotics.com">Kareem Shehata</maintainer>
   <author email="mpurvis@clearpathrobotics.com">Mike Purvis</author>
 
   <license>BSD</license>
