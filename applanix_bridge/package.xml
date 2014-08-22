@@ -15,21 +15,14 @@
   <url type="website">http://wiki.ros.org/applanix_bridge</url>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>message_generation</build_depend>
-  <!--<build_depend>common_msgs</build_depend>-->
-  <build_depend>diagnostic_msgs</build_depend>
-  <!--<build_depend>geometry</build_depend>-->
   <build_depend>applanix_msgs</build_depend>
-  <!--<build_depend>orocos_kinematics_dynamics</build_depend>-->
   <build_depend>rospy</build_depend>
   <run_depend>message_runtime</run_depend>
-  <!--<run_depend>common_msgs</run_depend>-->
   <run_depend>diagnostic_msgs</run_depend>
   <run_depend>geometry</run_depend>
   <run_depend>applanix_msgs</run_depend>
-  <!--<run_depend>orocos_kinematics_dynamics</run_depend>-->
-  <run_depend>python-impacket</run_depend>
-  <run_depend>python-pcapy</run_depend>
   <run_depend>rospy</run_depend>
+  <test_depend>python-impacket</test_depend>
+  <test_depend>python-pcapy</test_depend>
 
 </package>
