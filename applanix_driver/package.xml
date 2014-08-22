@@ -13,6 +13,7 @@
   <url type="website">http://wiki.ros.org/applanix_driver</url>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>applanix_bridge</run_depend>
 
   <export>
     <metapackage/>
