@@ -40,7 +40,9 @@
 # Please send comments, questions, or patches to skynet@clearpathrobotics.com
 #
 
-import roslib, roslib.genpy
+import genpy.message, genpy.base
+import roslib.msgs
+
 import rospy
 import struct
 from itertools import izip
@@ -66,7 +68,7 @@ class Handler(object):
 class SubMessageHandler(Handler):
   def __init__(self, field):
     self.name = field.name
-    self.msg_cls = roslib.message.get_message_class(field.type)
+    self.msg_cls = genpy.message.get_message_class(field.type)
 
   def deserialize(self, buff, msg):
     self.field(msg).translator().deserialize(buff)
@@ -80,7 +82,7 @@ class FixedFieldsHandler(Handler):
     struct_strs = ['<']
     def pattern(field):
       try:
-        return roslib.genpy.SIMPLE_TYPES_DICT[field.type]
+        return genpy.base.SIMPLE_TYPES_DICT[field.type]
       except KeyError:
         if field.base_type in ['uint8', 'char'] and field.array_len is not None:
           return "%is" % field.array_len
@@ -110,7 +112,7 @@ class SubMessageArrayHandler(Handler):
   def __init__(self, field):
     self.name = field.name
     self.name_count = "%s_count" % self.name
-    self.msg_cls = roslib.message.get_message_class(field.base_type)
+    self.msg_cls = genpy.message.get_message_class(field.base_type)
     self.submessage_size = self.msg_cls().translator().size
 
   def deserialize(self, buff, msg):
@@ -163,7 +165,7 @@ class Translator:
 
     fixed_fields = []
     for field in spec.parsed_fields():
-      if roslib.genpy.is_simple(field.base_type) and (field.array_len != None or not field.is_array):
+      if genpy.base.is_simple(field.base_type) and (field.array_len != None or not field.is_array):
         # Simple types and fixed-length character arrays.
         fixed_fields.append(field)
       else:
@@ -219,4 +221,4 @@ def translator(self):
     self.__class__._translator = Translator(self.__class__)
   return TranslatorProxy(self.__class__._translator, self)
 
-roslib.message.Message.translator = translator
+genpy.message.Message.translator = translator

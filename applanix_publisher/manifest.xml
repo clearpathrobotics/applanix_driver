@@ -11,7 +11,7 @@
   <depend package="applanix_bridge" />
   <depend package="applanix_msgs" />
   <depend package="tf" />
-  <depend package="kdl" />
+  <!-- <depend package="python_orocos_kdl" /> -->
   <depend package="sensor_msgs" />
   <depend package="nav_msgs" />
   <depend package="geometry_msgs" />
