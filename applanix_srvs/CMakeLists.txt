@@ -3,6 +3,7 @@ project(applanix_srvs)
 
 find_package(catkin REQUIRED COMPONENTS
   applanix_msgs
+  geometry_msgs
   message_generation
   rospy
 )

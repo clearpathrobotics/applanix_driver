@@ -77,6 +77,4 @@ generate_messages(
   geometry_msgs
 )
 
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
+catkin_package()
