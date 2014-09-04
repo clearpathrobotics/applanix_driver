@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>applanix_srvs</name>
-  <version>0.0.0</version>
+  <version>0.0.1</version>
   <description>
     Generated services for interacting with an Applanix POS LV
   </description>
