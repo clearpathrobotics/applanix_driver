@@ -15,3 +15,17 @@ catkin_package(
 #  CATKIN_DEPENDS common_msgs diagnostic_msgs geometry orocos_kinematics_dynamics rospy
 #  DEPENDS python-pcapy python-impacket
 )
+
+install(PROGRAMS
+  bin/bridge
+  bin/diagnostics_publisher
+  bin/params
+  bin/publisher
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+# add launch scripts to install
+install(DIRECTORY
+  launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
