@@ -43,7 +43,7 @@
 import rospy
 
 from applanix_msgs.msg import NavigationSolution
-from applanix_srvs.msg import AllMsgs
+from applanix_msgs.msg import AllMsgs
 from diagnostic_msgs.msg import DiagnosticArray
 from sensor_msgs.msg import NavSatFix, Imu
 

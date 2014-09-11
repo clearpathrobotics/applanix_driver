@@ -5,5 +5,5 @@
 msg_gen
 srv_gen
 build
-applanix_srvs/srv/*
-applanix_srvs/msg/*
+applanix_msgs/srv/*
+applanix_msgs/msg/AllMsgs.msg
