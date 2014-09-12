@@ -28,8 +28,6 @@ add_custom_command(
   DEPENDS ${mapping_py}
   )
 
-add_custom_target(AllMsgs.msg DEPENDS ${mapping_py})
-
 # go through each of the message names and generate a service
 FOREACH(msg_name ${gen_msg_names})
   MESSAGE("Generating service definition for ${msg_name}")
@@ -42,8 +40,6 @@ FOREACH(msg_name ${gen_msg_names})
     COMMAND ${mapping_py} -g ${msg_name} > ${srv_path}
     DEPENDS ${mapping_py}
     )
-
-  add_custom_target("Set${msg_name}.srv" DEPENDS ${mapping_py})
 
 ENDFOREACH(msg_name)
 
