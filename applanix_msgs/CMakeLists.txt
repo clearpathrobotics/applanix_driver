@@ -13,34 +13,32 @@ catkin_python_setup()
 
 SET(mapping_py "${CMAKE_CURRENT_SOURCE_DIR}/src/applanix_msgs/mapping.py")
 
+# handy macro for generating something via mapping
+MACRO(generate_file file args)
+  IF(NOT EXISTS ${file})
+    # if the file doesn't exist at configure time then the ROS message_generation
+    # tools tend to assert fails. Instead, just generate them now.
+    MESSAGE("Generating ${file}")
+    execute_process(COMMAND ${mapping_py} ${args} OUTPUT_FILE ${file})
+  ENDIF(NOT EXISTS ${file})
+  add_custom_command(
+    OUTPUT ${file}
+    COMMAND echo "Regenerating ${file}"
+    COMMAND ${mapping_py} ${args} > ${file}
+    DEPENDS ${mapping_py}
+    )
+ENDMACRO(generate_file)
+
 # get the list of all of the messages for which to generate services
 execute_process(COMMAND ${mapping_py} OUTPUT_VARIABLE gen_msg_names
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-MESSAGE("Generating AllMsgs.msg")
-SET(all_msgs_path "${CMAKE_CURRENT_SOURCE_DIR}/msg/AllMsgs.msg")
-# need to do this if the file doesn't exist already
-execute_process(COMMAND ${mapping_py} -a OUTPUT_FILE ${all_msgs_path})
-
-# custom command to generate AllMsgs
-add_custom_command(
-  OUTPUT ${all_msgs_path} COMMAND ${mapping_py} -a > ${all_msgs_path}
-  DEPENDS ${mapping_py}
-  )
+generate_file("${CMAKE_CURRENT_SOURCE_DIR}/msg/AllMsgs.msg" "-a")
 
 # go through each of the message names and generate a service
 FOREACH(msg_name ${gen_msg_names})
-  MESSAGE("Generating service definition for ${msg_name}")
-  SET(srv_path "${CMAKE_CURRENT_SOURCE_DIR}/srv/Set${msg_name}.srv")
-  execute_process(COMMAND ${mapping_py} -g ${msg_name} OUTPUT_FILE ${srv_path})
+  generate_file("${CMAKE_CURRENT_SOURCE_DIR}/srv/Set${msg_name}.srv" "-g ${msg_name}")
   SET(generated_srvs ${generated_srvs} "Set${msg_name}.srv;")
-
-  add_custom_command(
-    OUTPUT ${srv_path} 
-    COMMAND ${mapping_py} -g ${msg_name} > ${srv_path}
-    DEPENDS ${mapping_py}
-    )
-
 ENDFOREACH(msg_name)
 
 ## Generate messages in the 'msg' folder
