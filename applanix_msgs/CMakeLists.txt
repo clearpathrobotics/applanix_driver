@@ -14,7 +14,7 @@ catkin_python_setup()
 SET(mapping_py "${CMAKE_CURRENT_SOURCE_DIR}/src/applanix_msgs/mapping.py")
 
 # handy macro for generating something via mapping
-MACRO(generate_file file args)
+function(generate_file file args)
   IF(NOT EXISTS ${file})
     # if the file doesn't exist at configure time then the ROS message_generation
     # tools tend to assert fails. Instead, just generate them now.
@@ -27,7 +27,7 @@ MACRO(generate_file file args)
     COMMAND ${mapping_py} ${args} > ${file}
     DEPENDS ${mapping_py}
     )
-ENDMACRO(generate_file)
+endfunction(generate_file)
 
 # get the list of all of the messages for which to generate services
 execute_process(COMMAND ${mapping_py} OUTPUT_VARIABLE gen_msg_names
@@ -38,7 +38,7 @@ generate_file("${CMAKE_CURRENT_SOURCE_DIR}/msg/AllMsgs.msg" "-a")
 # go through each of the message names and generate a service
 FOREACH(msg_name ${gen_msg_names})
   generate_file("${CMAKE_CURRENT_SOURCE_DIR}/srv/Set${msg_name}.srv" "-g ${msg_name}")
-  SET(generated_srvs ${generated_srvs} "Set${msg_name}.srv;")
+  LIST(APPEND generated_srvs "Set${msg_name}.srv;")
 ENDFOREACH(msg_name)
 
 ## Generate messages in the 'msg' folder
