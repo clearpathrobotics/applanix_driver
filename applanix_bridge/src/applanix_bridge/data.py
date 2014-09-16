@@ -65,7 +65,7 @@ class DataPort(Port):
 
     # Aggregate message for republishing the sensor config as a single blob.
     all_msgs = applanix_msgs.msg.AllMsgs()
-    all_msgs_pub = rospy.Publisher("config", all_msgs.__class__, queue_size=1, latch=True) 
+    all_msgs_pub = rospy.Publisher("config", all_msgs.__class__, queue_size=5, latch=True) 
 
     # Listener object which tracks what topics have been subscribed to.
     listener = SubscribeListenerManager()
@@ -124,7 +124,7 @@ class SubscribeListenerManager():
   def __init__(self):
     self.lock = Lock()
     self.groups = set()
-    self.publisher = rospy.Publisher("subscribed_groups", applanix_msgs.msg.Groups, queue_size=1, latch=True)
+    self.publisher = rospy.Publisher("subscribed_groups", applanix_msgs.msg.Groups, queue_size=5, latch=True)
     self.publish()
 
   def publish(self):

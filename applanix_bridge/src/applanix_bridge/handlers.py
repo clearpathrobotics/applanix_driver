@@ -57,7 +57,7 @@ class NullHandler(Handler):
 
 class GroupHandler(Handler):
   def __init__(self, name, data_class, listener):
-    self.publisher = rospy.Publisher(name, data_class, queue_size=1, subscriber_listener=listener)
+    self.publisher = rospy.Publisher(name, data_class, queue_size=5, subscriber_listener=listener)
     self.message = self.publisher.data_class()
 
   def handle(self, buff):

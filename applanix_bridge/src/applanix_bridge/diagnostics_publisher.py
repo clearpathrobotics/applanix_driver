@@ -68,7 +68,7 @@ class BitfieldRepublisher(object):
       name = "Applanix AP10",
       message = "OK"))
     rospy.Subscriber(topic_name, topic_type, self._cb)
-    self.pub = rospy.Publisher("/diagnostics", DiagnosticArray, queue_size=1, latch=True)
+    self.pub = rospy.Publisher("/diagnostics", DiagnosticArray, queue_size=5, latch=True)
 
   def _cb(self, msg):
     self.status_msg.status[0].values = []
