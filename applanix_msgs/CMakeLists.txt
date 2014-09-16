@@ -37,7 +37,7 @@ generate_file("${CMAKE_CURRENT_SOURCE_DIR}/msg/AllMsgs.msg" "-a")
 
 # go through each of the message names and generate a service
 FOREACH(msg_name ${gen_msg_names})
-  generate_file("${CMAKE_CURRENT_SOURCE_DIR}/srv/Set${msg_name}.srv" "-g ${msg_name}")
+  generate_file("${CMAKE_CURRENT_SOURCE_DIR}/srv/Set${msg_name}.srv" "-g;${msg_name}")
   LIST(APPEND generated_srvs "Set${msg_name}.srv;")
 ENDFOREACH(msg_name)
 
