@@ -20,6 +20,7 @@
   <run_depend>message_runtime</run_depend>
   <run_depend>diagnostic_msgs</run_depend>
   <run_depend>geometry</run_depend>
+  <run_depend>geodesy</run_depend>
   <run_depend>applanix_msgs</run_depend>
   <run_depend>rospy</run_depend>
   <test_depend>python-impacket</test_depend>
