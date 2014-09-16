@@ -100,11 +100,11 @@ class ApplanixPublisher(object):
         self.zero_start = rospy.get_param('~zero_start', False) # If this is True, UTM will be pub'd wrt. our first recv'd coordinate
 
         # Topic publishers
-        self.pub_imu = rospy.Publisher('imu_data', Imu)
-        self.pub_odom = rospy.Publisher('gps_odom', Odometry)
-        self.pub_origin = rospy.Publisher('origin', Pose)
-        self.pub_navsatfix = rospy.Publisher('gps_fix', NavSatFix)
-        self.pub_navsatstatus = rospy.Publisher('gps_status', NavSatStatus)
+        self.pub_imu = rospy.Publisher('imu_data', Imu, queue_size=1)
+        self.pub_odom = rospy.Publisher('gps_odom', Odometry, queue_size=1)
+        self.pub_origin = rospy.Publisher('origin', Pose, queue_size=1)
+        self.pub_navsatfix = rospy.Publisher('gps_fix', NavSatFix, queue_size=1)
+        self.pub_navsatstatus = rospy.Publisher('gps_status', NavSatStatus, queue_size=1)
         if self.publish_tf:
             self.tf_broadcast = tf.TransfromBroadcaster()
 
