@@ -139,6 +139,13 @@ if __name__ == '__main__':
     print "---"
     print "applanix_msgs/Ack ack"
 
+  else:
+    print "Usage: mapping.py [-s|-a|-g <msg name>]"
+    print "If no arguments or -s given, list services to generate"
+    print "  -a generate AllMsgs message definition"
+    print "  -g <msg_name> Generate service for message type given"
+    sys.exit(1)
+
 
 else:
   # magic to replace class names with actual class instances
