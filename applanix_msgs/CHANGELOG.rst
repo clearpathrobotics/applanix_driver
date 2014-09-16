@@ -2,6 +2,21 @@
 Changelog for package applanix_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added help output to mapping in applanix_msgs and an error code on invalid arguments. This prevents bad builds from sneaking through.
+* Fixed bug in generation of services that would produce zero length files. Turns out that cmake send arguments from a variable as one argument and not split up by spaces. You have to separate the arguments by semicolons to make this work.
+* Optimized CMakeLists.txt for applanix_msgs:
+  * changed macro to function
+  * replaced SET with LIST(APPEND ...)
+* Moved the generation code into a macro to clean up the CMakeLists.txt
+* Removed custom targets, since those aren't actually necessary.
+* Merged applanix_msgs with applanix_srvs and adapted the mapping.py
+  script to generate all of the required elements. Updated the
+  CMakeLists.txt for applanix_msgs to generate services and AllMsgs.
+  Updated applanix_bridge for the changes.
+* Contributors: Kareem Shehata
+
 0.0.1 (2014-09-04)
 ------------------
 

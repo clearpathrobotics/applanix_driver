@@ -2,6 +2,17 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Increased queue size to 5 since data smoke test fails otherwise
+* Added queue sizes on Publishers to make Indigo complain less
+* Added dependency on geodesy
+* Merged applanix_msgs with applanix_srvs and adapted the mapping.py
+  script to generate all of the required elements. Updated the
+  CMakeLists.txt for applanix_msgs to generate services and AllMsgs.
+  Updated applanix_bridge for the changes.
+* Contributors: Kareem Shehata
+
 0.0.1 (2014-09-04)
 ------------------
 
