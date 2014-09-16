@@ -2,8 +2,8 @@
 Changelog for package applanix_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.2 (2014-09-16)
+------------------
 * Added help output to mapping in applanix_msgs and an error code on invalid arguments. This prevents bad builds from sneaking through.
 * Fixed bug in generation of services that would produce zero length files. Turns out that cmake send arguments from a variable as one argument and not split up by spaces. You have to separate the arguments by semicolons to make this work.
 * Optimized CMakeLists.txt for applanix_msgs:

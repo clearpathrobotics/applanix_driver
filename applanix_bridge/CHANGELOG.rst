@@ -2,8 +2,8 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.2 (2014-09-16)
+------------------
 * Increased queue size to 5 since data smoke test fails otherwise
 * Added queue sizes on Publishers to make Indigo complain less
 * Added dependency on geodesy
