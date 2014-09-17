@@ -1,0 +1,23 @@
+<launch>
+  <group ns="applanix">
+    <!-- Default IP -->
+    <rosparam>
+      ip: 192.168.53.100
+      include_raw: false
+      control: true
+      com_ports: [
+        { baud: 115200, input: "BASE_1_GNSS", output: "BASE_1_GNSS" },
+        { baud: 115200, input: "GNSS_1", output: "GNSS_1" },
+        ]
+      geometry:
+        imu_mounting_angle: { x: 0, y: -90, z: 0 }
+        imu_lever_arm: { x: 0, y: 0, z: 0 }
+        primary_gnss_lever_arm: { x: 0.5, y: 0.0, z: -0.5 }
+      rate: 100
+    </rosparam>
+    <node name="applanix_bridge" pkg="applanix_bridge" type="bridge" />
+    <node name="applanix_params" pkg="applanix_bridge" type="params" />
+    <node name="applanix_publisher" pkg="applanix_bridge" type="publisher" />
+    <node name="applanix_diagnostics" pkg="applanix_bridge" type="diagnostics_publisher" />
+  </group>
+</launch>
