@@ -62,6 +62,7 @@ class DataPort(Port):
 
   def run(self):
     self.sock.settimeout(1.0)
+    errors = 0
 
     # Aggregate message for republishing the sensor config as a single blob.
     all_msgs = applanix_msgs.msg.AllMsgs()

@@ -87,9 +87,9 @@ class Port(threading.Thread):
       raise ValueError("Bad header %s.%d" % pkt_id)
 
     # Special case for a troublesome undocumented packet.
-    if pkt_id == ("$GRP", 20015):
-      self.sock.recv(135)
-      return None, None
+    #if pkt_id == ("$GRP", 20015):
+    #  self.sock.recv(135)
+    #  return None, None
 
     # Receive remainder of packet from data socket. 
     pkt_str = self.sock.recv(self.header.length)
