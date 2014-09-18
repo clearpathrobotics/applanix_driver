@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8.3)
 project(applanix_bridge)
 
 find_package(catkin REQUIRED COMPONENTS
-  diagnostic_msgs
   applanix_msgs
   rospy
 )
