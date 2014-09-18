@@ -2,8 +2,8 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.4 (2014-09-18)
+------------------
 * Removing diagnostic_msgs from find_package because it isn't needed at build, it's handled by the run_depends, and it makes the build servers cry.
 * Contributors: Kareem Shehata
 
