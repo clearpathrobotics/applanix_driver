@@ -2,6 +2,11 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Removing diagnostic_msgs from find_package because it isn't needed at build, it's handled by the run_depends, and it makes the build servers cry.
+* Contributors: Kareem Shehata
+
 0.0.2 (2014-09-16)
 ------------------
 * Increased queue size to 5 since data smoke test fails otherwise
