@@ -106,7 +106,7 @@ class ApplanixPublisher(object):
         self.pub_navsatfix = rospy.Publisher('gps_fix', NavSatFix, queue_size=5)
         self.pub_navsatstatus = rospy.Publisher('gps_status', NavSatStatus, queue_size=5)
         if self.publish_tf:
-            self.tf_broadcast = tf.TransfromBroadcaster()
+            self.tf_broadcast = tf.TransformBroadcaster()
 
         # Init nav status
         self.nav_status = NavSatStatus()    # We need this for the NavSatFix broadcaster
