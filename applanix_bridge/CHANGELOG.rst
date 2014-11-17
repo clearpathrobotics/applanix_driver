@@ -2,8 +2,8 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.0.5 (2014-11-17)
-------------------
+Forthcoming
+-----------
 * Origin now includes the z dimension or altitude so that the odometry msgs are w.r.t. the current surface and not the sea level. quaternion assignment in tf broadcaster had a bug which is fixed now.
 * Fixing typo in publisher.py, we Transfrom != Transform
 * Contributors: Vaibhav Kumar Mehta
