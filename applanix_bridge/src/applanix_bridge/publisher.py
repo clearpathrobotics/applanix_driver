@@ -98,7 +98,7 @@ class ApplanixPublisher(object):
         self.odom_frame = rospy.get_param('~odom_frame', 'odom_combined')
         self.base_frame = rospy.get_param('~base_frame', 'base_footprint')
         self.zero_start = rospy.get_param('~zero_start', False) # If this is True, UTM will be pub'd wrt. our first recv'd coordinate
-
+        
         # Topic publishers
         self.pub_imu = rospy.Publisher('imu_data', Imu, queue_size=5)
         self.pub_odom = rospy.Publisher('gps_odom', Odometry, queue_size=5)
@@ -106,7 +106,7 @@ class ApplanixPublisher(object):
         self.pub_navsatfix = rospy.Publisher('gps_fix', NavSatFix, queue_size=5)
         self.pub_navsatstatus = rospy.Publisher('gps_status', NavSatStatus, queue_size=5)
         if self.publish_tf:
-            self.tf_broadcast = tf.TransfromBroadcaster()
+            self.tf_broadcast = tf.TransformBroadcaster()
 
         # Init nav status
         self.nav_status = NavSatStatus()    # We need this for the NavSatFix broadcaster
@@ -141,12 +141,14 @@ class ApplanixPublisher(object):
         if not self.init and self.zero_start:
             self.origin.x = utm_pos.easting
             self.origin.y = utm_pos.northing
+            self.origin.z = data.altitude
             self.init = True
 
         # Publish origin reference for others to know about
         p = Pose()
         p.position.x = self.origin.x
         p.position.y = self.origin.y
+        p.position.z = self.origin.z
         self.pub_origin.publish(p)
 
         #
@@ -159,7 +161,7 @@ class ApplanixPublisher(object):
         odom.child_frame_id = self.base_frame
         odom.pose.pose.position.x = utm_pos.easting - self.origin.x
         odom.pose.pose.position.y = utm_pos.northing - self.origin.y
-        odom.pose.pose.position.z = data.altitude
+        odom.pose.pose.position.z = data.altitude - self.origin.z
         odom.pose.pose.orientation = Quaternion(*orient)
         odom.pose.covariance = POSE_COVAR
         # Twist is relative to /vehicle frame
@@ -173,14 +175,14 @@ class ApplanixPublisher(object):
 
         self.pub_odom.publish(odom)
 
+        t_tf =  odom.pose.pose.position.x, odom.pose.pose.position.y, odom.pose.pose.position.z
+        q_tf =  Quaternion(*orient).x, Quaternion(*orient).y, Quaternion(*orient).z, Quaternion(*orient).w
         #
         # Odometry transform (if required)
         #
         if self.publish_tf:
-            self.tf_broadcast.sendTransform(
-                (odom.pose.pose.position.x, odom.pose.pose.position.y,
-                 odom.pose.pose.position.z), Quaternion(*orient),
-                 odom.header.stamp,odom.child_frame_id, odom.frame_id)
+            self.tf_broadcast.sendTransform(t_tf,q_tf,
+                 odom.header.stamp,odom.child_frame_id, odom.header.frame_id)
 
         # 
         # NavSatFix
