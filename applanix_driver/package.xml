@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>applanix_driver</name>
-  <version>0.0.4</version>
+  <version>0.0.5</version>
   <description>
     Comprehensive ROS interface to Applanix POS LV products
   </description>
