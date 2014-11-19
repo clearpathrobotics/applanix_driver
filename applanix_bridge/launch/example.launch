@@ -13,10 +13,10 @@
       geometry:
         imu_lever_arm: { x: 0.75, y: -0.12, z: 2.9 }
         primary_gnss_lever_arm: {x: -0.65, y: 0.852, z: 1.15}
-        ref_mounting_angle: {x: -180, y: 0, z: 0}
-        imu_mounting_angle: { x: 0, y: 90, z: 180 }        
-        aux_1_gnss_lever_arm: {x: -0.65, y: -0.847, z: 1.15}
-      rate: 100
+<!--         ref_mounting_angle: {x: -180, y: 0, z: 0}
+ -->        imu_mounting_angle: { x: 0, y: 90, z: 180 }        
+<!--         aux_1_gnss_lever_arm: {x: -0.65, y: -0.847, z: 1.15}
+ -->      rate: 100
 
     </rosparam>
      
