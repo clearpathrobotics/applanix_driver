@@ -52,6 +52,26 @@ response_codes = dict([(val, name) for name, val in applanix_msgs.msg.Ack.__dict
 def main():
   rospy.init_node("applanix_params")
 
+  gams_params = rospy.get_param('gams_params', None)
+  if gams_params != None:
+    req_msg = applanix_msgs.msg.GAMSParams()
+    req_msg.antenna_separation = gams_params['antenna_separation']
+    req_msg.baseline_vector.x = gams_params['baseline_vector']['x']
+    req_msg.baseline_vector.y = gams_params['baseline_vector']['y']
+    req_msg.baseline_vector.z = gams_params['baseline_vector']['z']
+    call_applanix_service('gams',req_msg)
+    rospy.loginfo("Configured GAMS params.")
+
+  dmi_params = rospy.get_param('dmi_params', None)
+  if dmi_params != None:
+    req_msg = applanix_msgs.msg.AidingSensorParams()
+    req_msg.dmi_scale_factor = dmi_params['dmi_scale_factor']
+    req_msg.dmi_lever_arm.x = dmi_params['dmi_lever_arm']['x']
+    req_msg.dmi_lever_arm.y = dmi_params['dmi_lever_arm']['y']
+    req_msg.dmi_lever_arm.z = dmi_params['dmi_lever_arm']['z']
+    call_applanix_service('aiding_sensors',req_msg)
+    rospy.loginfo("Configured DMI params.")
+
   com_ports = rospy.get_param('com_ports', None) 
   if com_ports != None:
     req_msg = applanix_msgs.msg.COMPortSetup()
@@ -82,7 +102,7 @@ def main():
   geometry = rospy.get_param('geometry', None) 
   if geometry != None:
     req_msg = applanix_msgs.msg.GeneralParams()
-    for vector_name in ['imu_lever_arm', 'primary_gnss_lever_arm', 'imu_mounting_angle', 'ref_mounting_angle']:
+    for vector_name in ['imu_lever_arm', 'primary_gnss_lever_arm', 'imu_mounting_angle', 'ref_mounting_angle', 'aux_1_gnss_lever_arm', 'aux_2_gnss_lever_arm']:
       if vector_name in geometry:
         vector = geometry[vector_name]
         getattr(req_msg, vector_name).x = vector['x']
@@ -94,6 +114,7 @@ def main():
     req_msg.multipath = 0  # LOW setting, do not change. 
     call_applanix_service('general', req_msg)
     rospy.loginfo("Configured geometry.")
+
 
   # Default rate of 10Hz
   rate = rospy.get_param('rate', 10)
@@ -119,7 +140,6 @@ def main():
 
   rospy.spin()
  
-
 
 def call_applanix_service(name, req):
   service_defn = getattr(applanix_msgs.srv, "Set" + req.__class__.__name__)
