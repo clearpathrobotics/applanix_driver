@@ -2,22 +2,38 @@
   <group ns="applanix">
     <!-- Default IP -->
     <rosparam>
-      ip: 192.168.53.100
+      <!-- Set it to correct IP for Applanix -->
+      ip: 192.168.101.3
       include_raw: false
       control: true
       com_ports: [
-        { baud: 115200, input: "BASE_1_GNSS", output: "BASE_1_GNSS" },
+        { baud: 115200, input: "BASE_1_GNSS", output: "NMEA" },
+        { baud: 115200, input: "BASE_2_GNSS", output: "NMEA" },
         { baud: 115200, input: "GNSS_1", output: "GNSS_1" },
         ]
       geometry:
-        imu_mounting_angle: { x: 0, y: -90, z: 0 }
-        imu_lever_arm: { x: 0, y: 0, z: 0 }
-        primary_gnss_lever_arm: { x: 0.5, y: 0.0, z: -0.5 }
+        imu_lever_arm: { x: 0.75, y: -0.12, z: 2.9 }
+        primary_gnss_lever_arm: {x: -0.65, y: 0.852, z: 1.15}
+        ref_mounting_angle: {x: 0, y: 0, z: 0}
+        imu_mounting_angle: { x: 0, y: 90, z: 180 }
+      gams_params:
+        antenna_separation: 1.7
+        baseline_vector: {x: 0, y: -1.7, z: 0}
+      dmi_params:
+        dmi_scale_factor: 0
+        dmi_lever_arm: {x: 0, y: 0, z: 0}
       rate: 100
+
     </rosparam>
+     
     <node name="applanix_bridge" pkg="applanix_bridge" type="bridge" />
     <node name="applanix_params" pkg="applanix_bridge" type="params" />
-    <node name="applanix_publisher" pkg="applanix_bridge" type="publisher" />
+    <node name="applanix_publisher" pkg="applanix_bridge" type="publisher" >
+      <param name="publish_tf" value="True" />
+      <param name="odom_frame" value="gps_odom" />
+      <param name="base_frame" value="base_footprint" />
+      <param name="zero_start" value="True" />      
+    </node>
     <node name="applanix_diagnostics" pkg="applanix_bridge" type="diagnostics_publisher" />
   </group>
 </launch>
