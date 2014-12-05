@@ -132,12 +132,14 @@ class ApplanixPublisher(object):
         if self.nav_status.status == NavSatStatus.STATUS_NO_FIX:
             return
         
-        orient = PyKDL.Rotation.RPY(RAD(data.roll), RAD(data.pitch), RAD(data.heading)).GetQuaternion()
+        # the pose is published w.r.t. /reference frame which is supposed to be NED
+        # but ROS assumes odometry and all tfs to be in ENU that is why the picth and
+        # roll are swapped and heading needs to be subtracted from 90 degrees. 
+        orient = PyKDL.Rotation.RPY(RAD(data.pitch), RAD(data.roll), RAD(90-data.heading)).GetQuaternion()
 
         # UTM conversion
         utm_pos = geodesy.utm.fromLatLong(data.latitude, data.longitude)
         # Initialize starting point if we haven't yet
-        # TODO: Do we want to follow UTexas' lead and reinit to a nonzero point within the same UTM grid?
         if not self.init and self.zero_start:
             self.origin.x = utm_pos.easting
             self.origin.y = utm_pos.northing
@@ -164,9 +166,11 @@ class ApplanixPublisher(object):
         odom.pose.pose.position.z = data.altitude - self.origin.z
         odom.pose.pose.orientation = Quaternion(*orient)
         odom.pose.covariance = POSE_COVAR
-        # Twist is relative to /vehicle frame
-        odom.twist.twist.linear.x = data.speed
-        odom.twist.twist.linear.y = 0
+
+        # Twist is relative to /reference frame or /vehicle frame and
+        # NED to ENU conversion is needed here too
+        odom.twist.twist.linear.x = data.east_vel
+        odom.twist.twist.linear.y = data.north_vel
         odom.twist.twist.linear.z = -data.down_vel
         odom.twist.twist.angular.x = RAD(data.ang_rate_long)
         odom.twist.twist.angular.y = RAD(-data.ang_rate_trans)
@@ -217,7 +221,7 @@ class ApplanixPublisher(object):
         # Angular rates
         imu.angular_velocity.x = RAD(data.ang_rate_long)
         imu.angular_velocity.y = RAD(-data.ang_rate_trans)
-        imu.angular_velocity.y = RAD(-data.ang_rate_down)
+        imu.angular_velocity.z = RAD(-data.ang_rate_down)
         imu.angular_velocity_covariance = IMU_VEL_COVAR
 
         # Linear acceleration
