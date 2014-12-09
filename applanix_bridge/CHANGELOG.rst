@@ -2,8 +2,8 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.5 (2014-12-09)
+------------------
 * Typo in the imu angular velocity z component is fixed. All the required NED (/reference or /vehicle for Applanix) to ENU (/base_footprint or /base_link in ROS) frame conversions are applied to get correct Pose and twist data.
 * gams params, dmi params and some geometry params added to be configured correctly. some sample values are provided in the example.launch also added in this commit
 * launch file updated as auxiliary gnss to reference frame lever is not neeeded.
