@@ -2,6 +2,16 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Typo in the imu angular velocity z component is fixed. All the required NED (/reference or /vehicle for Applanix) to ENU (/base_footprint or /base_link in ROS) frame conversions are applied to get correct Pose and twist data.
+* gams params, dmi params and some geometry params added to be configured correctly. some sample values are provided in the example.launch also added in this commit
+* launch file updated as auxiliary gnss to reference frame lever is not neeeded.
+* updated the launch file with correct installation parameters for applanix
+* Origin now includes the z dimension or altitude so that the odometry msgs are w.r.t. the current surface and not the sea level. quaternion assignment in tf broadcaster had a bug which is fixed now.
+* Fixing typo in publisher.py, we Transfrom != Transform
+* Contributors: Vaibhav Kumar Mehta
+
 0.0.4 (2014-09-18)
 ------------------
 * Removing diagnostic_msgs from find_package because it isn't needed at build, it's handled by the run_depends, and it makes the build servers cry.
