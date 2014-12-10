@@ -59,6 +59,7 @@ def main():
     req_msg.baseline_vector.x = gams_params['baseline_vector']['x']
     req_msg.baseline_vector.y = gams_params['baseline_vector']['y']
     req_msg.baseline_vector.z = gams_params['baseline_vector']['z']
+    req_msg.max_heading_error_rms = gams_params['max_heading_error_rms']
     call_applanix_service('gams',req_msg)
     rospy.loginfo("Configured GAMS params.")
 
