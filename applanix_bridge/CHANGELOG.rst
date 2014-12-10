@@ -2,8 +2,8 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.6 (2014-12-10)
+------------------
 * Gams param max_heading_error_rms has to be assigned to 3.0 degrees default and cannot be zero.
 * Contributors: Vaibhav Kumar Mehta
 
