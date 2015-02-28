@@ -132,10 +132,12 @@ class ApplanixPublisher(object):
         if self.nav_status.status == NavSatStatus.STATUS_NO_FIX:
             return
         
-        # the pose is published w.r.t. /reference frame which is supposed to be NED
-        # but ROS assumes odometry and all tfs to be in ENU that is why the picth and
-        # roll are swapped and heading needs to be subtracted from 90 degrees. 
-        orient = PyKDL.Rotation.RPY(RAD(data.pitch), RAD(data.roll), RAD(90-data.heading)).GetQuaternion()
+        # Changing from NED from the Applanix to ENU in ROS
+        # Roll is still roll, since it's WRT to the x axis of the vehicle
+        # Pitch is -ve since axis goes the other way (+y to right vs left)
+        # Yaw (or heading) in Applanix is clockwise starting with North
+        # In ROS it's counterclockwise startin with East 
+        orient = PyKDL.Rotation.RPY(RAD(data.roll), RAD(-data.pitch), RAD(90-data.heading)).GetQuaternion()
 
         # UTM conversion
         utm_pos = geodesy.utm.fromLatLong(data.latitude, data.longitude)
