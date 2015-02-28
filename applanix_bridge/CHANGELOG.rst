@@ -2,8 +2,8 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.7 (2015-02-28)
+------------------
 * Adding launch file for publishing Odometry and TF.
   Useful for adding Odometry and TF's when using bag files that don't include them
 * Fixed orientation mapping when publishing Odometry and converting from NED to ENU
