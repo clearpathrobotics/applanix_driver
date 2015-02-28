@@ -2,6 +2,13 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Adding launch file for publishing Odometry and TF.
+  Useful for adding Odometry and TF's when using bag files that don't include them
+* Fixed orientation mapping when publishing Odometry and converting from NED to ENU
+* Contributors: Kareem Shehata
+
 0.0.6 (2014-12-10)
 ------------------
 * Gams param max_heading_error_rms has to be assigned to 3.0 degrees default and cannot be zero.
