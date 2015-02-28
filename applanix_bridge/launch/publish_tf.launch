@@ -1,0 +1,10 @@
+<launch>
+  <group ns="applanix">
+    <node name="applanix_publisher" pkg="applanix_bridge" type="publisher" >
+      <param name="publish_tf" value="True" />
+      <param name="odom_frame" value="gps_odom" />
+      <param name="base_frame" value="base_footprint" />
+      <param name="zero_start" value="True" />      
+    </node>
+  </group>
+</launch>
