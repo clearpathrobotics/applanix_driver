@@ -20,9 +20,6 @@ Forthcoming
 * gams params, dmi params and some geometry params added to be configured correctly. some sample values are provided in the example.launch also added in this commit
 * launch file updated as auxiliary gnss to reference frame lever is not neeeded.
 * updated the launch file with correct installation parameters for applanix
-
-0.0.5 (2014-11-17)
-------------------
 * Origin now includes the z dimension or altitude so that the odometry msgs are w.r.t. the current surface and not the sea level. quaternion assignment in tf broadcaster had a bug which is fixed now.
 * Fixing typo in publisher.py, we Transfrom != Transform
 * Contributors: Vaibhav Kumar Mehta
