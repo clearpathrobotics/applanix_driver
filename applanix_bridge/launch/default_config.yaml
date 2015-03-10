@@ -1,0 +1,26 @@
+# Default configuration of Applanix
+ip: 192.168.101.3
+include_raw: false
+control: true
+com_ports: [
+  { baud: 115200, input: "BASE_1_GNSS", output: "NMEA" },
+  { baud: 115200, input: "BASE_2_GNSS", output: "NMEA" },
+  { baud: 115200, input: "GNSS_1", output: "GNSS_1" },
+  ]
+
+geometry:
+  imu_lever_arm: { x: 0.75, y: -0.12, z: 2.9 }
+  primary_gnss_lever_arm: {x: -0.65, y: 0.852, z: 1.15}
+  ref_mounting_angle: {x: 0, y: 0, z: 0}
+  imu_mounting_angle: { x: 0, y: 90, z: 180 }
+
+gams_params:
+  antenna_separation: 1.7
+  baseline_vector: { x: 0, y: -1.7, z: 0 }
+  max_heading_error_rms: 3.0
+
+dmi_params:
+  dmi_scale_factor: 0
+  dmi_lever_arm: {x: 0, y: 0, z: 0}
+
+rate: 100
