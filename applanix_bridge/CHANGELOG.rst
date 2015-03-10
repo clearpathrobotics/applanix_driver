@@ -2,6 +2,12 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Renaming example launch for more general use.
+* Parameterizing the applanix_bridge launch file
+* Contributors: Kareem Shehata
+
 0.0.7 (2015-02-28)
 ------------------
 * Adding launch file for publishing Odometry and TF.
