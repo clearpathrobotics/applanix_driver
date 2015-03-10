@@ -2,8 +2,8 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.8 (2015-03-10)
+------------------
 * Renaming example launch for more general use.
 * Parameterizing the applanix_bridge launch file
 * Contributors: Kareem Shehata
