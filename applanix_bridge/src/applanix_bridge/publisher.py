@@ -97,6 +97,7 @@ class ApplanixPublisher(object):
         self.publish_tf = rospy.get_param('~publish_tf', False)
         self.odom_frame = rospy.get_param('~odom_frame', 'odom_combined')
         self.base_frame = rospy.get_param('~base_frame', 'base_footprint')
+        self.zero_start = rospy.get_param('~zero_start', False)
         
         origin_param = rospy.get_param('~origin', None)
         self.origin = Point()
@@ -105,8 +106,6 @@ class ApplanixPublisher(object):
             self.origin.x = origin_param["east"]
             self.origin.y = origin_param["north"]
             self.origin.z = origin_param["alt"]
-        else:
-            self.zero_start = True
 
         # Topic publishers
         self.pub_imu = rospy.Publisher('imu_data', Imu, queue_size=5)

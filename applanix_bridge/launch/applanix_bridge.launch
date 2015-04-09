@@ -3,6 +3,7 @@
   <arg name="publish_tf" default="True"/>
   <arg name="odom_frame" default="gps_odom"/>
   <arg name="base_frame" default="base_link"/>
+  <arg name="zero_start" default="False"/>
   <arg name="origin" default="None"/>
 
   <group ns="applanix">
@@ -15,6 +16,7 @@
         publish_tf: $(arg publish_tf)
         odom_frame: $(arg odom_frame)
         base_frame: $(arg base_frame)
+        zero_start: $(arg zero_start)
         origin: $(arg origin)
       </rosparam>
     </node>
