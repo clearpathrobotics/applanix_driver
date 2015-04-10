@@ -2,6 +2,11 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added a parameter for setting the origin in publisher.py. If not set, and zero_start is set then the first GPS fix is used. Otherwise, default is UTM.
+* Contributors: Kareem Shehata
+
 0.0.8 (2015-03-10)
 ------------------
 * Renaming example launch for more general use.

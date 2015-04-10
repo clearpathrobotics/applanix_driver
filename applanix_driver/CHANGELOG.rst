@@ -2,6 +2,9 @@
 Changelog for package applanix_driver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.8 (2015-03-10)
 ------------------
 
