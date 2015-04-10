@@ -3,7 +3,8 @@
   <arg name="publish_tf" default="True"/>
   <arg name="odom_frame" default="gps_odom"/>
   <arg name="base_frame" default="base_link"/>
-  <arg name="zero_start" default="True"/>
+  <arg name="zero_start" default="False"/>
+  <arg name="origin" default="None"/>
 
   <group ns="applanix">
     <rosparam command="load" file="$(arg param_file)"/>
@@ -11,10 +12,13 @@
     <node name="applanix_bridge" pkg="applanix_bridge" type="bridge" />
     <node name="applanix_params" pkg="applanix_bridge" type="params" />
     <node name="applanix_publisher" pkg="applanix_bridge" type="publisher" >
-      <param name="publish_tf" value="$(arg publish_tf)" />
-      <param name="odom_frame" value="$(arg odom_frame)" />
-      <param name="base_frame" value="$(arg base_frame)" />
-      <param name="zero_start" value="$(arg zero_start)" />      
+      <rosparam subst_value="true">
+        publish_tf: $(arg publish_tf)
+        odom_frame: $(arg odom_frame)
+        base_frame: $(arg base_frame)
+        zero_start: $(arg zero_start)
+        origin: $(arg origin)
+      </rosparam>
     </node>
     <node name="applanix_diagnostics" pkg="applanix_bridge" type="diagnostics_publisher" />
   </group>

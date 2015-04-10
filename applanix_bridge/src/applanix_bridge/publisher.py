@@ -97,8 +97,16 @@ class ApplanixPublisher(object):
         self.publish_tf = rospy.get_param('~publish_tf', False)
         self.odom_frame = rospy.get_param('~odom_frame', 'odom_combined')
         self.base_frame = rospy.get_param('~base_frame', 'base_footprint')
-        self.zero_start = rospy.get_param('~zero_start', False) # If this is True, UTM will be pub'd wrt. our first recv'd coordinate
+        self.zero_start = rospy.get_param('~zero_start', False)
         
+        origin_param = rospy.get_param('~origin', None)
+        self.origin = Point()
+        if origin_param is not None and origin_param != "None":
+            self.zero_start = False
+            self.origin.x = origin_param["east"]
+            self.origin.y = origin_param["north"]
+            self.origin.z = origin_param["alt"]
+
         # Topic publishers
         self.pub_imu = rospy.Publisher('imu_data', Imu, queue_size=5)
         self.pub_odom = rospy.Publisher('gps_odom', Odometry, queue_size=5)
@@ -114,7 +122,6 @@ class ApplanixPublisher(object):
         self.nav_status.service = NavSatStatus.SERVICE_GPS
 
         self.init = False       # If we've been initialized
-        self.origin = Point()   # Where we've started
         
         # Subscribed topics
         rospy.Subscriber('nav', NavigationSolution, self.navigation_handler)
