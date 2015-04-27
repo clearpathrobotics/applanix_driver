@@ -99,13 +99,20 @@ class ApplanixPublisher(object):
         self.base_frame = rospy.get_param('~base_frame', 'base_footprint')
         self.zero_start = rospy.get_param('~zero_start', False)
         
-        origin_param = rospy.get_param('~origin', None)
+        origin_param = rospy.get_param('/gps_origin', None)
         self.origin = Point()
         if origin_param is not None and origin_param != "None":
             self.zero_start = False
             self.origin.x = origin_param["east"]
             self.origin.y = origin_param["north"]
             self.origin.z = origin_param["alt"]
+        elif not self.zero_start:
+            origin_param = {
+                "east"  : self.origin.x,
+                "north" : self.origin.y,
+                "alt"   : self.origin.z,
+            }
+            rospy.set_param('/gps_origin', origin_param)
 
         # Topic publishers
         self.pub_imu = rospy.Publisher('imu_data', Imu, queue_size=5)
@@ -154,6 +161,12 @@ class ApplanixPublisher(object):
             self.origin.y = utm_pos.northing
             self.origin.z = data.altitude
             self.init = True
+            origin_param = {
+                "east"  : self.origin.x,
+                "north" : self.origin.y,
+                "alt"   : self.origin.z,
+            }
+            rospy.set_param('/gps_origin', origin_param)
 
         # Publish origin reference for others to know about
         p = Pose()

@@ -17,7 +17,7 @@
         odom_frame: $(arg odom_frame)
         base_frame: $(arg base_frame)
         zero_start: $(arg zero_start)
-        origin: $(arg origin)
+        /gps_origin: $(arg origin)
       </rosparam>
     </node>
     <node name="applanix_diagnostics" pkg="applanix_bridge" type="diagnostics_publisher" />
