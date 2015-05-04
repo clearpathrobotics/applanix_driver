@@ -2,8 +2,8 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.10 (2015-05-04)
+-------------------
 * Applanix driver will now set the /gps_origin parameter if not set at startup with the origin used for fixes
 * Contributors: Kareem Shehata
 
