@@ -2,6 +2,11 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Applanix driver will now set the /gps_origin parameter if not set at startup with the origin used for fixes
+* Contributors: Kareem Shehata
+
 0.0.9 (2015-04-10)
 ------------------
 * Added a parameter for setting the origin in publisher.py. If not set, and zero_start is set then the first GPS fix is used. Otherwise, default is UTM.
