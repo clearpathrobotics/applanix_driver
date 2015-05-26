@@ -98,11 +98,11 @@ class Port(threading.Thread):
     footer_data = StringIO(pkt_str[-self.footer.translator().size:])
     self.footer.translator().deserialize(footer_data)
     if str(self.footer.end) != msg.CommonFooter.END:
-      raise("Bad footer from pkt %s.%d" % pkt_id)
+      raise ValueError("Bad footer from pkt %s.%d" % pkt_id)
 
     # Check package checksum.
     if self._checksum(StringIO(header_str + pkt_str)) != 0:
-      raise("Bad checksum from pkt %s.%d: %%d" % pkt_id % checksum)
+      raise ValueError("Bad checksum from pkt %s.%d: %%d" % pkt_id % checksum)
 
     return pkt_id, pkt_str 
 

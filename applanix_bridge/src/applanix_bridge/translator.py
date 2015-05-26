@@ -87,7 +87,7 @@ class FixedFieldsHandler(Handler):
         if field.base_type in ['uint8', 'char'] and field.array_len is not None:
           return "%is" % field.array_len
         else:
-          raise
+          raise ValueError("Field type " + str(field.type) + " not found")
           
     struct_strs.extend([pattern(f) for f in fields])
     self.struct = struct.Struct(''.join(struct_strs))
