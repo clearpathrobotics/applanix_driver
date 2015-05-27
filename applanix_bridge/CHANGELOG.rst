@@ -2,8 +2,8 @@
 Changelog for package applanix_bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.11 (2015-05-27)
+-------------------
 * Fixed the way exceptions are raised when bad data is received
 * Contributors: Kareem Shehata
 
