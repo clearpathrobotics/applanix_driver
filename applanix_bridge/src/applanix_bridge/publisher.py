@@ -12,9 +12,9 @@
 #            ROBOTICS™
 #
 #
-#  Copyright © 2012 Clearpath Robotics, Inc. 
+#  Copyright © 2012 Clearpath Robotics, Inc.
 #  All Rights Reserved
-#  
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
@@ -25,7 +25,7 @@
 #     * Neither the name of Clearpath Robotics, Inc. nor the
 #       names of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -98,7 +98,7 @@ class ApplanixPublisher(object):
         self.odom_frame = rospy.get_param('~odom_frame', 'odom_combined')
         self.base_frame = rospy.get_param('~base_frame', 'base_footprint')
         self.zero_start = rospy.get_param('~zero_start', False)
-        
+
         origin_param = rospy.get_param('/gps_origin', None)
         self.origin = Point()
         if origin_param is not None and origin_param != "None":
@@ -129,11 +129,11 @@ class ApplanixPublisher(object):
         self.nav_status.service = NavSatStatus.SERVICE_GPS
 
         self.init = False       # If we've been initialized
-        
+
         # Subscribed topics
         rospy.Subscriber('nav', NavigationSolution, self.navigation_handler)
         rospy.Subscriber('status/gnss/primary', GNSSStatus, self.status_handler)
-       
+
     def navigation_handler(self, data):
         """ Rebroadcasts navigation data in the following formats:
         1) /odom => /base footprint transform (if enabled, as per REP 105)
@@ -145,12 +145,12 @@ class ApplanixPublisher(object):
         # If we don't have a fix, don't publish anything...
         if self.nav_status.status == NavSatStatus.STATUS_NO_FIX:
             return
-        
+
         # Changing from NED from the Applanix to ENU in ROS
         # Roll is still roll, since it's WRT to the x axis of the vehicle
         # Pitch is -ve since axis goes the other way (+y to right vs left)
         # Yaw (or heading) in Applanix is clockwise starting with North
-        # In ROS it's counterclockwise startin with East 
+        # In ROS it's counterclockwise startin with East
         orient = PyKDL.Rotation.RPY(RAD(data.roll), RAD(-data.pitch), RAD(90-data.heading)).GetQuaternion()
 
         # UTM conversion
@@ -176,7 +176,7 @@ class ApplanixPublisher(object):
         self.pub_origin.publish(p)
 
         #
-        # Odometry 
+        # Odometry
         # TODO: Work out these covariances properly from DOP
         #
         odom = Odometry()
@@ -210,7 +210,7 @@ class ApplanixPublisher(object):
             self.tf_broadcast.sendTransform(t_tf,q_tf,
                  odom.header.stamp,odom.child_frame_id, odom.header.frame_id)
 
-        # 
+        #
         # NavSatFix
         # TODO: Work out these covariances properly from DOP
         #
@@ -225,21 +225,21 @@ class ApplanixPublisher(object):
 
         navsat.position_covariance = NAVSAT_COVAR
         navsat.position_covariance_type = NavSatFix.COVARIANCE_TYPE_UNKNOWN
-        
+
         self.pub_navsatfix.publish(navsat)
-        
+
         #
         # IMU
         # TODO: Work out these covariances properly
         #
         imu = Imu()
-        imu.header.stamp == rospy.Time.now()
+        imu.header.stamp = rospy.Time.now()
         imu.header.frame_id = self.base_frame
-      
+
         # Orientation
         imu.orientation = Quaternion(*orient)
         imu.orientation_covariance = IMU_ORIENT_COVAR
- 
+
         # Angular rates
         imu.angular_velocity.x = RAD(data.ang_rate_long)
         imu.angular_velocity.y = RAD(-data.ang_rate_trans)
@@ -253,8 +253,8 @@ class ApplanixPublisher(object):
         imu.linear_acceleration_covariance = IMU_ACCEL_COVAR
 
         self.pub_imu.publish(imu)
-        
-         
+
+
         pass
 
     def status_handler(self, data):
@@ -279,7 +279,7 @@ class ApplanixPublisher(object):
 
         # Assume GPS - this isn't exposed
         self.nav_status.service = NavSatStatus.SERVICE_GPS
-            
+
         self.pub_navsatstatus.publish(self.nav_status)
 
 
